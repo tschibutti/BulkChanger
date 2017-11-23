@@ -1,6 +1,13 @@
-2017-11-23 16:18:05 INFO config: load config from file
-2017-11-23 16:18:05 INFO devices: using config file as source
-2017-11-23 16:18:05 INFO devices: found 1 firewalls
-2017-11-23 16:18:05 INFO ******************************************************************
-2017-11-23 16:18:05 INFO IP: 192.168.8.2	 Port:8443	 Customer: Config File
-2017-11-23 16:18:07 INFO executor: no accesspoints found
+2017-11-23 16:34:53 INFO config: load config from file
+2017-11-23 16:34:53 INFO devices: using config file as source
+2017-11-23 16:34:53 INFO devices: found 1 firewalls
+2017-11-23 16:34:53 INFO ******************************************************************
+2017-11-23 16:34:53 INFO IP: 192.168.8.2	 Port:8443	 Customer: Config File
+2017-11-23 16:34:54 INFO executor: no accesspoints found
+
+*********************************
+*	Total	Success		Failed	*
+*	1		1			0		*
+*********************************
+
+Please check the following devices manually:

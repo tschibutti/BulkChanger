@@ -22,7 +22,7 @@ if __name__ == '__main__':
 
     # LOG FILE
     logging.basicConfig(filemode='w',
-                        filename='D:/Daten/Dropbox/Florian/50 FortiNet/REST API/BulkChanger/bulkchanger.log',
+                        filename='C:/BulkChanger/bulkchanger.log',
                         level=logging.INFO, format='%(asctime)s %(levelname)s %(message)s', datefmt='%Y-%m-%d %H:%M:%S')
 
     # CONFIG FILE
@@ -51,6 +51,13 @@ if __name__ == '__main__':
         print('Current device: ' + devices[i].customer)
         logging.info('******************************************************************')
         logging.info('IP: ' + devices[i].ip + '\t Port:' + devices[i].port + '\t Customer: ' + devices[i].customer)
+        if devices[i].check_ip():
+            logging.warning('ip-check: private ip, cannot handle right now')
+            run_failed += 1
+            failed_devices.append(devices[i])
+            devices[i].reason = 'private ip address range'
+            i += 1
+            continue
         devices[i].ping()
         if devices[i].online == 1:
             logging.warning('ping: device is offline, skip device')

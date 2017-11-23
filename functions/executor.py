@@ -191,7 +191,7 @@ def check_existence(device, cmd):
 
 
 def run_summary(total, failed, failed_devices):
-    f = open('bulkchanger.log', 'a')
+    f = open('C:/BulkChanger/infocollector.log', 'a')
     f.write('\n*********************************')
     f.write('\n*\tTotal\tSuccess\t\tFailed\t*')
     f.write('\n*\t' + str(total) + '\t\t' + str(total - failed) + '\t\t' + '\t' + str(failed) + '\t\t*')

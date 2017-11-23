@@ -82,4 +82,16 @@ class Device:
         self.online = os.system('ping -n 1 -w 1500 ' + self.ip + ' > nul')
         self.online = os.system('ping -n 1 -w 1500 ' + self.ip + ' > nul')
 
-
+    def check_ip(self) -> bool:
+        first_octet = int(self.ip.split('.')[0])
+        second_octet = int(self.ip.split('.')[1])
+        third_octet = int(self.ip.split('.')[2])
+        if second_octet == 168 and third_octet == 8:
+            return False
+        if first_octet == 10:
+            return True
+        if first_octet == 172 and second_octet >= 16 and second_octet <= 31:
+            return True
+        if first_octet == 192 and second_octet == 168:
+            return True
+        return False
