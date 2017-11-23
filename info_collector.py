@@ -10,8 +10,7 @@ if __name__ == '__main__':
     run_failed = 0
 
     # LOG FILE
-    logging.basicConfig(filemode='w', filename='D:/Daten/Dropbox/Florian/50 FortiNet/REST API/BulkChanger/'
-                                               'infocollector.log',
+    logging.basicConfig(filemode='w', filename='C:/BulkChanger/infocollector.log',
                         level=logging.INFO, format='%(asctime)s %(levelname)s %(message)s', datefmt='%Y-%m-%d %H:%M:%S')
     # CONFIG FILE
     if (Config().firewall_user == '') or (Config().firewall_password == ''):
