@@ -1,0 +1,14 @@
+config firewall service custom
+    edit "fortisslvpn"
+        set tcp-portrange 10443
+    next
+    edit "fortiadmin"
+        set tcp-portrange 8443
+    next
+end
+
+config firewall service group
+    edit "guest-services"
+        set member "HTTP" "HTTPS" "IMAP" "IMAPS" "POP3" "POP3S" "SMTP" "SMTPS" "FTP" "PING" "DNS"
+    next
+end

@@ -1,0 +1,28 @@
+2017-11-16 18:09:19 INFO config: load config from file
+2017-11-16 18:09:19 INFO devices: using config file as source
+2017-11-16 18:09:19 INFO devices: found 1 firewalls
+2017-11-16 18:09:19 INFO command: converted cli command to rest api command
+2017-11-16 18:09:19 INFO command: parsed 2 commands
+2017-11-16 18:09:19 INFO ******************************************************************
+2017-11-16 18:09:19 INFO IP: 192.168.8.2	 Port:8443	 Customer: Config File
+2017-11-16 18:09:20 INFO executor: object exist, updating settings
+2017-11-16 18:09:20 INFO executor: object exist, updating settings
+
+*********************************
+*	Total	Success		Failed	*
+*	1		1			0		*
+*********************************
+
+Please check the following devices manually:
+*********************************
+*	Total	Success		Failed	*
+*	1		1			0		*
+*********************************
+
+Please check the following devices manually:
+*********************************
+*	Total	Success		Failed	*
+*	1		1			0		*
+*********************************
+
+Please check the following devices manually:

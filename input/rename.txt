@@ -1,0 +1,4 @@
+config webfilter ftgd-local-cat
+	rename custom1 to allow
+	rename custom2 to block
+end

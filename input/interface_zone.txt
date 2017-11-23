@@ -1,0 +1,5 @@
+config system zone
+    edit "internet"
+        set interface "wan1" "wan2"
+    next
+end

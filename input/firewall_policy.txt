@@ -1,0 +1,14 @@
+config firewall policy
+    edit 0
+        set srcintf "internal"
+        set dstintf "internet"
+        set srcaddr "all"
+        set dstaddr "all"
+        set action accept
+        set schedule "always"
+        set service "ALL"
+        set logtraffic all
+        set comments "fge test"
+        set nat enable
+    next
+end
