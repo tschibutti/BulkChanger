@@ -1,5 +1,6 @@
 import logging
 import os
+import getpass
 from functions import cli_converter, customers, executor
 from utils.config import Config
 
@@ -16,14 +17,14 @@ if __name__ == '__main__':
     # VARIABLES
     devices = []
     failed_devices = []
+    skipped_devices = []
     success_devices = []
     cmd = []
-    run_failed = 0
 
     # LOG FILE
     logging.basicConfig(filemode='w',
                         filename='C:/BulkChanger/bulkchanger.log',
-                        level=logging.INFO, format='%(asctime)s %(levelname)s %(message)s', datefmt='%Y-%m-%d %H:%M:%S')
+                        level=logging.DEBUG, format='%(asctime)s %(levelname)s %(message)s', datefmt='%Y-%m-%d %H:%M:%S')
 
     # CONFIG FILE
     if (Config().firewall_user == '') or (Config().firewall_password == ''):
@@ -31,8 +32,8 @@ if __name__ == '__main__':
         print('user or password not defined in config file')
         firewall_user = input('firewall username: ')
         # not working with PyCharm
-        # firewall_password = getpass.getpass(prompt='Firewall password: ', stream=None)
-        firewall_password = input('firewall password: ')
+        firewall_password = getpass.getpass(prompt='Firewall password: ', stream=None)
+        #firewall_password = input('firewall password: ')
     else:
         firewall_user = Config().firewall_user
         firewall_password = Config().firewall_password
@@ -42,7 +43,7 @@ if __name__ == '__main__':
 
     # GET COMMANDS
     cmd = cli_converter.convert_command('input.txt', Config().input_folder)
-    print_cmd(cmd)
+    # print_cmd(cmd)
     # exit()
 
     # START EXECUTION
@@ -53,7 +54,6 @@ if __name__ == '__main__':
         logging.info('IP: ' + devices[i].ip + '\t Port:' + devices[i].port + '\t Customer: ' + devices[i].customer)
         if devices[i].check_ip():
             logging.warning('ip-check: private ip, cannot handle right now')
-            run_failed += 1
             failed_devices.append(devices[i])
             devices[i].reason = 'private ip address range'
             i += 1
@@ -61,9 +61,8 @@ if __name__ == '__main__':
         devices[i].ping()
         if devices[i].online == 1:
             logging.warning('ping: device is offline, skip device')
-            run_failed += 1
             failed_devices.append(devices[i])
-            devices[i].reason = 'no ping resonde'
+            devices[i].reason = 'no ping resonse'
             i += 1
             continue
         logging.debug('ping: device is online')
@@ -73,14 +72,12 @@ if __name__ == '__main__':
         elif devices[i].connected:
             devices[i].firmware_check()
         if not devices[i].connected:
-            run_failed += 1
             failed_devices.append(devices[i])
             i += 1
             continue
         executor.fmg_check(devices[i])
         if devices[i].fortimanager:
-            run_failed += 1
-            failed_devices.append(devices[i])
+            skipped_devices.append(devices[i])
             i += 1
             continue
         executor.perform_backup(devices[i])
@@ -89,7 +86,6 @@ if __name__ == '__main__':
         devices[i].ping()
         if devices[i].online == 1:
             logging.warning('ping: no response after command execution')
-            run_failed += 1
             failed_devices.append(devices[i])
             i += 1
             continue
@@ -97,15 +93,15 @@ if __name__ == '__main__':
         success_devices.append(devices[i])
         i += 1
 
-    # PRINT RESULT
-    executor.run_summary(len(devices), run_failed, failed_devices)
-
     # DELTE TEMPORARY FILES
     file = Config().input_folder + '/ca.cer'
     try:
         os.remove(file)
     except FileNotFoundError:
         logging.debug('certifiacte: source file not exist')
+
+    # PRINT RESULT
+    executor.run_summary(len(devices), failed_devices, skipped_devices)
 
     print('check log file for details')
     exit()

@@ -1,6 +1,7 @@
 config firewall service custom
-    edit "fortisslvpn"
-        set tcp-portrange 10443
+    edit "fortimanager"
+        set category "Remote Access"
+        set tcp-portrange 541
     next
     edit "fortiadmin"
         set tcp-portrange 8443

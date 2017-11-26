@@ -6,23 +6,21 @@ from functions import cli_converter
 class TestConvert_command(TestCase):
     def test_delete_command(self):
         cmd = cli_converter.convert_command('delete.txt',
-                                            'D:/Daten/Dropbox/Florian/50 FortiNet/REST API/BulkChanger/input')
+                                            'C:/BulkChanger/input')
         self.assertEqual(cmd[0].body, '')
         self.assertEqual(cmd[0].action, 'delete')
         self.assertEqual(cmd[0].name, '1')
         self.assertEqual(cmd[0].path, 'firewall/policy')
 
     def test_device_settings(self):
-        cmd = cli_converter.convert_command('device_settings.txt', 'D:/Daten/Dropbox/Florian/50 FortiNet/REST API'
-                                                                   '/BulkChanger/input')
+        cmd = cli_converter.convert_command('device_settings.txt', 'C:/BulkChanger/input')
         self.assertEqual(cmd[0].body, '{"admin-sport":"8443","admintimeout":"240"}')
         self.assertEqual(cmd[0].action, '')
         self.assertEqual(cmd[0].name, '')
         self.assertEqual(cmd[0].path, 'system/global')
 
     def test_policy_settings(self):
-        cmd = cli_converter.convert_command('policy_settings.txt', 'D:/Daten/Dropbox/Florian/50 FortiNet/REST API/'
-                                                                   'BulkChanger/input')
+        cmd = cli_converter.convert_command('policy_settings.txt', 'C:/BulkChanger/input')
         self.assertEqual(cmd[0].body, '{"name":"dpo","accprofile":"super_admin","vdom":"root","password":'
                                       '"ENC AK16D3CKqjt+2aM/xf2ieZJcDoFdx2MhS5TxQWngTJi61s="}')
         self.assertEqual(cmd[0].action, 'edit')
@@ -35,8 +33,7 @@ class TestConvert_command(TestCase):
         self.assertEqual(cmd[1].path, 'system/admin')
 
     def test_complex_object(self):
-        cmd = cli_converter.convert_command('complex_object.txt', 'D:/Daten/Dropbox/Florian/50 FortiNet/REST API/'
-                                                                  'BulkChanger/input')
+        cmd = cli_converter.convert_command('complex_object.txt', 'C:/BulkChanger/input')
         self.assertEqual(cmd[0].body,
                          '{\'json\':{"srcintf":[{"name":"internal"}],"dstintf":[{"name":"wan1"}],'
                          '"srcaddr":[{"name":"all"}],"dstaddr":[{"name":"all"}],"action":"accept",'
@@ -47,8 +44,7 @@ class TestConvert_command(TestCase):
         self.assertEqual(cmd[0].path, 'firewall/policy')
 
     def test_interface_zone(self):
-        cmd = cli_converter.convert_command('interface_zone.txt', 'D:/Daten/Dropbox/Florian/50 FortiNet/REST API/'
-                                                                  'BulkChanger/input')
+        cmd = cli_converter.convert_command('interface_zone.txt', 'C:/BulkChanger/input')
         self.assertEqual(cmd[0].body,
                          '{"name":"internet","interface":[{"interface-name":"wan1"},{"interface-name":"wan2"}]}')
         self.assertEqual(cmd[0].action, 'edit')
@@ -56,8 +52,7 @@ class TestConvert_command(TestCase):
         self.assertEqual(cmd[0].path, 'system/zone')
 
     def test_antivirus_profile(self):
-        cmd = cli_converter.convert_command('antivirus_profile.txt', 'D:/Daten/Dropbox/Florian/50 FortiNet/REST API/'
-                                                                     'BulkChanger/input')
+        cmd = cli_converter.convert_command('antivirus_profile.txt', 'C:/BulkChanger/input')
         self.assertEqual(cmd[0].body,
                          '{"name":"av_standard","inspection-mode":"proxy","http":{"options":"scan"},'
                          '"ftp":{"options":"scan"},"imap":{"options":"scan"},"pop3":{"options":"scan"},'
@@ -67,8 +62,7 @@ class TestConvert_command(TestCase):
         self.assertEqual(cmd[0].path, 'antivirus/profile')
 
     def test_app_conrol(self):
-        cmd = cli_converter.convert_command('app_control.txt', 'D:/Daten/Dropbox/Florian/50 FortiNet/REST API/'
-                                                               'BulkChanger/input')
+        cmd = cli_converter.convert_command('app_control.txt', 'C:/BulkChanger/input')
         self.assertEqual(cmd[0].body,
                          '{"name":"ac_standard","other-application-log":"enable","unknown-application-log":"enable",'
                          '"entries":[{"category":[{"id":"6"},{"id":"19"}]},{"category":[{"id":"2"},{"id":"3"},'
@@ -80,8 +74,7 @@ class TestConvert_command(TestCase):
         self.assertEqual(cmd[0].path, 'application/list')
 
     def test_ips_sensor(self):
-        cmd = cli_converter.convert_command('ips_sensor.txt', 'D:/Daten/Dropbox/Florian/50 FortiNet/REST API/'
-                                                              'BulkChanger/input')
+        cmd = cli_converter.convert_command('ips_sensor.txt', 'C:/BulkChanger/input')
         self.assertEqual(cmd[0].body,
                          '{"name":"ips_outgoing","entries":[{"location":"client ","severity":"critical ",'
                          '"os":"Other Windows Linux MacOS ","status":"enable","log-packet":"enable","action":"block"},'
@@ -98,8 +91,7 @@ class TestConvert_command(TestCase):
         self.assertEqual(cmd[1].path, 'ips/sensor')
 
     def test_firewall_policy(self):
-        cmd = cli_converter.convert_command('firewall_policy.txt', 'D:/Daten/Dropbox/Florian/50 FortiNet/REST API/'
-                                                                   'BulkChanger/input')
+        cmd = cli_converter.convert_command('firewall_policy.txt', 'C:/BulkChanger/input')
         self.assertEqual(cmd[0].body,
                          '{\'json\':{"srcintf":[{"name":"internal"}],"dstintf":[{"name":"internet"}],'
                          '"srcaddr":[{"name":"all"}],"dstaddr":[{"name":"all"}],"action":"accept","schedule":"always",'
@@ -109,8 +101,7 @@ class TestConvert_command(TestCase):
         self.assertEqual(cmd[0].path, 'firewall/policy')
 
     def test_local_in_policy(self):
-        cmd = cli_converter.convert_command('local_in_policy.txt', 'D:/Daten/Dropbox/Florian/50 FortiNet/REST API/'
-                                                                   'BulkChanger/input')
+        cmd = cli_converter.convert_command('local_in_policy.txt', 'C:/BulkChanger/input')
         self.assertEqual(cmd[0].body, '{\'json\':{"intf":"internet","srcaddr":[{"name":"all"}],'
                                       '"dstaddr":[{"name":"all"}],"action":"accept","service":[{"name":"PING"},'
                                       '{"name":"IKE"},{"name":"ESP"},{"name":"HTTPS"},{"name":"fortisslvpn"}],'
@@ -132,8 +123,7 @@ class TestConvert_command(TestCase):
         self.assertEqual(cmd[2].path, 'firewall/local-in-policy')
 
     def test_proxy_options(self):
-        cmd = cli_converter.convert_command('proxy_options.txt', 'D:/Daten/Dropbox/Florian/50 FortiNet/REST API/'
-                                                                 'BulkChanger/input')
+        cmd = cli_converter.convert_command('proxy_options.txt', 'C:/BulkChanger/input')
         self.assertEqual(cmd[0].body, '{"name":"po_standard","http":{"ports":"80","options":"clientcomfort",'
                                       '"comfort-interval":"1","comfort-amount":"1024","post-lang":null},'
                                       '"ftp":{"ports":"21","options":"clientcomfort","comfort-interval":"1",'
@@ -156,8 +146,7 @@ class TestConvert_command(TestCase):
         self.assertEqual(cmd[1].path, 'firewall/profile-protocol-options')
 
     def test_rename(self):
-        cmd = cli_converter.convert_command('rename.txt', 'D:/Daten/Dropbox/Florian/50 FortiNet/REST API/'
-                                                          'BulkChanger/input')
+        cmd = cli_converter.convert_command('rename.txt', 'C:/BulkChanger/input')
         self.assertEqual(cmd[0].body, '{"desc":"allow"}')
         self.assertEqual(cmd[0].action, 'rename')
         self.assertEqual(cmd[0].name, 'allow')
@@ -168,11 +157,10 @@ class TestConvert_command(TestCase):
         self.assertEqual(cmd[1].path, 'webfilter/ftgd-local-cat/custom2')
 
     def test_firewall_service(self):
-        cmd = cli_converter.convert_command('firewall_service.txt', 'D:/Daten/Dropbox/Florian/50 FortiNet/REST API/'
-                                                                    'BulkChanger/input')
-        self.assertEqual(cmd[0].body, '{"name":"fortisslvpn","tcp-portrange":"10443"}')
+        cmd = cli_converter.convert_command('firewall_service.txt', 'C:/BulkChanger/input')
+        self.assertEqual(cmd[0].body, '{"name":"fortimanager","category":"Remote Access","tcp-portrange":"541"}')
         self.assertEqual(cmd[0].action, 'edit')
-        self.assertEqual(cmd[0].name, 'fortisslvpn')
+        self.assertEqual(cmd[0].name, 'fortimanager')
         self.assertEqual(cmd[0].path, 'firewall.service/custom')
         self.assertEqual(cmd[1].body, '{"name":"fortiadmin","tcp-portrange":"8443"}')
         self.assertEqual(cmd[1].action, 'edit')
@@ -187,8 +175,7 @@ class TestConvert_command(TestCase):
         self.assertEqual(cmd[2].path, 'firewall.service/group')
 
     def test_ssl_vpn(self):
-        cmd = cli_converter.convert_command('ssl_vpn.txt', 'D:/Daten/Dropbox/Florian/50 FortiNet/REST API/'
-                                                                    'BulkChanger/input')
+        cmd = cli_converter.convert_command('ssl_vpn.txt', 'C:/BulkChanger/input')
         self.assertEqual(cmd[0].body, '')
         self.assertEqual(cmd[0].action, 'delete')
         self.assertEqual(cmd[0].name, 'full-access')
@@ -218,8 +205,7 @@ class TestConvert_command(TestCase):
         self.assertEqual(cmd[4].path, 'vpn.ssl/settings')
 
     def test_webfilter_profile(self):
-        cmd = cli_converter.convert_command('webfilter_profile.txt', 'D:/Daten/Dropbox/Florian/50 FortiNet/REST API/'
-                                                          'BulkChanger/input')
+        cmd = cli_converter.convert_command('webfilter_profile.txt', 'C:/BulkChanger/input')
         self.assertEqual(cmd[0].body, '{"name":"wf_standard","override":{"ovrd-user-group":""},'
                                       '"web":{"log-search":"enable"},'
                                       '"ftgd-wf":{"options":"http-err-detail redir-block",'
@@ -239,3 +225,22 @@ class TestConvert_command(TestCase):
         self.assertEqual(cmd[0].action, 'edit')
         self.assertEqual(cmd[0].name, 'wf_standard')
         self.assertEqual(cmd[0].path, 'webfilter/profile')
+
+    def test_firewall_address(self):
+        cmd = cli_converter.convert_command('firewall_address.txt', 'C:/BulkChanger/input')
+        self.assertEqual(cmd[0].body, '{"name":"ffn-support-i1","subnet":"193.104.116.2 255.255.255.255"}')
+        self.assertEqual(cmd[0].action, 'edit')
+        self.assertEqual(cmd[0].name, 'ffn-support-i1')
+        self.assertEqual(cmd[0].path, 'firewall/address')
+        self.assertEqual(cmd[1].body, '{"name":"net_sslvpn","associated-interface":"ssl.root",'
+                                      '"subnet":"10.254.254.0 255.255.255.0"}')
+        self.assertEqual(cmd[1].action, 'edit')
+        self.assertEqual(cmd[1].name, 'net_sslvpn')
+        self.assertEqual(cmd[1].path, 'firewall/address')
+        self.assertEqual(cmd[2].body, '{"name":"grp_ffn-support","member":[{"name":"ffn-support-i1"},'
+                                      '{"name":"ffn-support-i4"},{"name":"fqdn_gway.firstframe.net"},'
+                                      '{"name":"fqdn_surfgate.firstframe.net"},'
+                                      '{"name":"fqdn_manager.firstframe.net"}]}')
+        self.assertEqual(cmd[2].action, 'edit')
+        self.assertEqual(cmd[2].name, 'grp_ffn-support')
+        self.assertEqual(cmd[2].path, 'firewall/addrgrp')

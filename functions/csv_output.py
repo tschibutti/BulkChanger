@@ -8,8 +8,8 @@ def save_info(devices):
     try:
         with open(file, 'w') as csvfile:
             header = ['Kundenname', 'IP-Adresse', 'Port', 'Seriennummer', 'Firmware', 'FortiCare', 'FortiGuard',
-                      'AV-DB', 'FortiManager', 'Uptime', 'SSIDs', 'AP-Name', 'AP-Serials', 'AP-Firmware']
-            writer = csv.DictWriter(csvfile, fieldnames=header, delimiter=';')
+                      'AV-DB', 'FortiManager', 'Local-in-policy', 'Uptime', 'SSIDs', 'AP-Name', 'AP-Serials', 'AP-Firmware']
+            writer = csv.DictWriter(csvfile, fieldnames=header, delimiter=';', lineterminator='\n')
             writer.writeheader()
 
             i = 0
@@ -18,8 +18,8 @@ def save_info(devices):
                                  'Port': devices[i].port, 'Seriennummer': devices[i].serial,
                                  'Firmware': devices[i].firmware, 'FortiCare': devices[i].forticare,
                                  'FortiGuard': devices[i].fortiguard, 'AV-DB': devices[i].av_db,
-                                 'FortiManager': devices[i].fortimanager, 'Uptime': devices[i].uptime,
-                                 'SSIDs': ','.join(map(str, set(devices[i].ssid))),
+                                 'FortiManager': devices[i].fortimanager, 'Local-in-policy': devices[i].local_in,
+                                 'Uptime': devices[i].uptime, 'SSIDs': ','.join(map(str, set(devices[i].ssid))),
                                  'AP-Name': ','.join(map(str, devices[i].ap_name)),
                                  'AP-Serials': ','.join(map(str, devices[i].ap_serial)),
                                  'AP-Firmware': ','.join(map(str, devices[i].ap_firmware))})

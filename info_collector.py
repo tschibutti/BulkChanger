@@ -1,4 +1,5 @@
 import logging
+import getpass
 from functions import csv_output, customers, executor
 from utils.config import Config
 
@@ -7,7 +8,6 @@ if __name__ == '__main__':
     devices = []
     failed_devices = []
     success_devices = []
-    run_failed = 0
 
     # LOG FILE
     logging.basicConfig(filemode='w', filename='C:/BulkChanger/infocollector.log',
@@ -18,8 +18,8 @@ if __name__ == '__main__':
         print('user or password not defined in config file')
         firewall_user = input('firewall username: ')
         # not working with PyCharm
-        # firewall_password = getpass.getpass(prompt='Firewall password: ', stream=None)
-        firewall_password = input('firewall password: ')
+        firewall_password = getpass.getpass(prompt='Firewall password: ', stream=None)
+        # firewall_password = input('firewall password: ')
     else:
         firewall_user = Config().firewall_user
         firewall_password = Config().firewall_password
@@ -35,7 +35,6 @@ if __name__ == '__main__':
         logging.info('IP: ' + devices[i].ip + '\t Port:' + devices[i].port + '\t Customer: ' + devices[i].customer)
         if devices[i].check_ip():
             logging.warning('ip-check: private ip, cannot handle right now')
-            run_failed += 1
             failed_devices.append(devices[i])
             devices[i].reason = 'private ip address range'
             i += 1
@@ -43,9 +42,8 @@ if __name__ == '__main__':
         devices[i].ping()
         if devices[i].online == 1:
             logging.warning('ping: device is offline, skip device')
-            run_failed += 1
             failed_devices.append(devices[i])
-            devices[i].reason = 'no ping resonde'
+            devices[i].reason = 'no ping resonse'
             i += 1
             continue
         logging.debug('ping: device is online')
@@ -55,23 +53,16 @@ if __name__ == '__main__':
         elif devices[i].connected == 1:
             devices[i].firmware_check()
         if devices[i].connected == 0:
-            run_failed += 1
             failed_devices.append(devices[i])
             i += 1
             continue
         executor.fmg_check(devices[i])
-        if devices[i].fortimanager:
-            run_failed += 1
-            failed_devices.append(devices[i])
-            i += 1
-            continue
-        executor.perform_backup(devices[i])
+        # executor.perform_backup(devices[i])
         executor.collect_info(devices[i])
         devices[i].logout()
         devices[i].ping()
         if devices[i].online == 1:
             logging.warning('ping: no response after command execution')
-            run_failed += 1
             failed_devices.append(devices[i])
             i += 1
             continue
@@ -81,7 +72,7 @@ if __name__ == '__main__':
 
     # PRINT RESULT
     csv_output.save_info(devices)
-    executor.run_summary(len(devices), run_failed, failed_devices)
+    executor.run_summary(len(devices), failed_devices)
 
     print('check log file for details')
     exit()

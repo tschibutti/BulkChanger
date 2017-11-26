@@ -1,5 +1,6 @@
 import os
 import urllib3
+import re
 from requests import RequestException
 from requests import Session
 from json import JSONDecodeError
@@ -32,6 +33,7 @@ class Device:
         self.ap_firmware = []
         self.ap_serial = []
         self.ap_name = []
+        self.local_in = False
 
     def login(self, user, password):
         self.session = Session()
@@ -83,6 +85,10 @@ class Device:
         self.online = os.system('ping -n 1 -w 1500 ' + self.ip + ' > nul')
 
     def check_ip(self) -> bool:
+        numbers = sum(c.isdigit() for c in self.ip)
+        if numbers < 4:
+            return False
+
         first_octet = int(self.ip.split('.')[0])
         second_octet = int(self.ip.split('.')[1])
         third_octet = int(self.ip.split('.')[2])

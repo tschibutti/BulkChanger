@@ -1,51 +1,645 @@
+# global settings (start)
+config system global
+    set admin-sport 8443
+    set admintimeout 240
+    set hostname "FGTXXY-KUNDE-XX"
+    set gui-theme mariner
+    set revision-backup-on-logout enable
+    set strong-crypto enable
+    set snat-route-change enable
+    set timezone 26
+end
+# global settings (end)
+
+# set allowaccess and status on interfaces (start)
+config system interface
+    edit "wan1"
+        set vdom "root"
+        set mode dhcp
+        set allowaccess ping https ssh
+        set type physical
+    next
+    edit "wan2"
+        set vdom "root"
+        set mode static
+        set allowaccess ping https ssh
+        set status down
+        set type physical
+        set ip 0.0.0.0/0
+    next
+    edit "ssl.root"
+        set vdom "root"
+        set type tunnel
+        set alias "SSL VPN interface"
+    next
+end
+# set allowaccess and status on interfaces (end)
+
+# super admin account settings (start)
+config system admin
+    edit "dpo"
+        set accprofile "super_admin"
+        set vdom "root"
+        set password ENC AK16D3CKqjt+2aM/xf2ieZJcDoFdx2MhS5TxQWngTJi61s=
+    next
+    edit "dgu"
+        set accprofile "super_admin"
+        set vdom "root"
+        set password ENC AK1P+a8jSjvASnxe4qTPCFGtCkpZYhdUJDWC1IzLHQVRe0=
+    next
+    edit "fbo"
+        set accprofile "super_admin"
+        set vdom "root"
+        set password ENC AK1PcCPgDRzoXZDfPspRp0+ouBniU5HATFZ+c/4oLHbCOI=
+    next
+    edit "jan"
+        set accprofile "super_admin"
+        set vdom "root"
+        set password ENC AK13JhECHOSgYBLnHThRDpR+Yq/GsAQQeCqLlpfD/oIx+w=
+    next
+    edit "rst"
+        set accprofile "super_admin"
+        set vdom "root"
+        set password ENC AK1VogLMZZlj3ooB39WMG8dC+PZx1EQxZAkeojbgLHk8CY=
+    next
+    edit "yha"
+        set accprofile "super_admin"
+        set vdom "root"
+        set password ENC AK1fUNg98aU3YRmXkS4UTjjVfD2Jcjq5Z3tGZrPi0Im2p0=
+    next
+    edit "rbo"
+           set accprofile "super_admin"
+           set vdom "root"
+           set password ENC SH2F/av2Id9rkI2XC+4zjfYCAuLjaV8aTHBchIVAYtJ8inBUUNBsOBGa68TjTA=
+    next
+    edit "fge"
+           set accprofile "super_admin"
+           set vdom "root"
+           set password ENC SH23+4qpYlKoUBGf5I39qvuwVS7HZFtw11las/zpIdE/svYN8jFMPOGvKJDdW0=
+    next
+end
+# super admin account settings (end)
+
+# system settings (start)
+config system settings
+    set gui-default-policy-columns "#" "policyid" "source" "dstaddr" "schedule" "service" "action" "profile" "nat" "logtraffic" "hit_count" "last_used"
+    set gui-dhcp-advanced enable
+    set gui-dns-database enable
+    set gui-dynamic-routing enable
+    set gui-allow-unnamed-policy enable
+    set gui-ips enable
+    set gui-multiple-utm-profiles enable
+    set inspection-mode proxy
+end
+# system settings (end)
+
+# setup dns (start)
+config system dns
+    set primary 8.8.8.8
+    set secondary 81.221.250.10
+end
+# setup dns (end)
+
+# remove existing policies (start)
+config firewall policy
+    delete 1
+end
+# remove existing policies (end)
+
+# configure zone internet (start)
+config system zone
+    edit "internet"
+        set interface "wan1" "wan2"
+    next
+end
+# configure zone internet (end)
+
+# setup addresses and groups (start)
+config firewall address
+    edit "ffn-support-i1"
+        set subnet 193.104.116.2 255.255.255.255
+    next
+    edit "ffn-support-i4"
+        set subnet 185.75.154.0 255.255.255.248
+    next
+    edit "fqdn_gway.firstframe.net"
+        set type fqdn
+        set fqdn "gway.firstframe.net"
+    next
+    edit "fqdn_surfgate.firstframe.net"
+        set type fqdn
+        set fqdn "surfgate.firstframe.net"
+    next
+    edit "fqdn_manager.firstframe.net"
+        set type fqdn
+        set fqdn "manager.firstframe.net"
+    next
+    edit "hst_forti-trustedHost2"
+        set subnet 213.30.189.66 255.255.255.255
+    next
+    edit "hst_forti-trustedHost3"
+        set subnet 62.212.100.34 255.255.255.255
+    next
+    edit "net_fortitac1"
+        set subnet 212.67.74.32 255.255.255.224
+    next
+    edit "net_sslvpn"
+        set associated-interface "ssl.root"
+        set subnet 10.254.254.0 255.255.255.0
+    next
+    edit "net_swiccom-voip"
+        set subnet 195.186.128.0 255.255.254.0
+    next
+end
+
+config firewall addrgrp
+    edit "grp_ffn-support"
+        set member "ffn-support-i1" "ffn-support-i4" "fqdn_gway.firstframe.net" "fqdn_surfgate.firstframe.net" "fqdn_manager.firstframe.net"
+    next
+    edit "grp_forti-support"
+        set member "hst_forti-trustedHost2" "hst_forti-trustedHost3" "net_fortitac1"
+    next
+end
+# setup addresses and groups (end)
+
+# setup custom services and groups (start)
+config firewall service custom
+    edit "fortisslvpn"
+        set tcp-portrange 10443
+    next
+    edit "fortiadmin"
+        set tcp-portrange 8443
+    next
+    edit "fortimanager"
+        set category "Remote Access"
+        set tcp-portrange 541
+    next
+        edit "netbios-ns"
+        set protocol TCP/UDP/SCTP
+        set tcp-portrange 137
+    next
+    edit "netbios-dgm"
+        set protocol TCP/UDP/SCTP
+        set tcp-portrange 138
+    next
+    edit "netbios-ssn"
+        set protocol TCP/UDP/SCTP
+        set tcp-portrange 139
+    next
+    edit "ldaps"
+        set protocol TCP/UDP/SCTP
+        set tcp-portrange 636
+    next
+    edit "gc_ldap"
+        set protocol TCP/UDP/SCTP
+        set tcp-portrange 3268
+    next
+    edit "gc_ldaps"
+        set protocol TCP/UDP/SCTP
+        set tcp-portrange 3269
+    next
+    edit "udp_high-port-range"
+        set category "VoIP, Messaging & Other Applications"
+        set udp-portrange 1025-65535
+    next
+end
+
+config firewall service group
+    edit "guest-services"
+        set member "HTTP" "HTTPS" "IMAP" "IMAPS" "POP3" "POP3S" "SMTP" "SMTPS" "FTP" "PING" "DNS"
+    next
+end
+# setup custom services and groups (end)
+
+# setup wf ftgd-local-cat(start)
+config webfilter ftgd-local-cat
+rename custom1 to allow
+rename custom2 to block
+end
+# setup wf ftgd-local-cat(end)
+
+# setup ips (start)
+config ips sensor
+delete all_default
+delete all_default_pass
+delete protect_client
+delete protect_email_server
+delete protect_http_server
+delete high_security
+    edit "ips_outgoing"
+            config entries
+                edit 0
+                    set location client
+                    set severity critical
+                    set os Other Windows Linux MacOS
+                    set status enable
+                    set log-packet enable
+                    set action block
+                next
+                edit 0
+                    set location client
+                    set severity high
+                    set os Other Windows Linux MacOS
+                next
+            end
+    next
+    edit "ips_incoming"
+            config entries
+                edit 0
+                    set location server
+                    set severity critical
+                    set os Other Windows Linux
+                    set status enable
+                    set log-packet enable
+                    set action block
+                next
+                edit 0
+                    set location server
+                    set severity high
+                    set os Other Windows Linux
+                next
+            end
+    next
+end
+# setup ips (end)
+
+# setup app-control (start)
+config application list
+    edit "ac_standard"
+        set other-application-log enable
+        set unknown-application-log enable
+            config entries
+                edit 0
+                    set category 6 19
+                next
+                edit 0
+                    set category 2 3 5 7 8 12 15 17 21 22 23 25 26 28 29 30 31
+                    set action pass
+                next
+            end
+    next
+end
+# setup app-control (end)
+
+# setup casi (start)
+config application casi profile
+    clone default to casi_standard
+    edit casi_standard
+        unset comment
+    next
+end
+# setup casi (stop)
+
+# setup local users and groups (start)
+config user local
+    edit "rst"
+        set type password
+        set passwd ENC fnQXDXWmySseoLjDk41nx93EZkVodaVtBuelMKlHck8qnTuiEjgkCZGoct/kVmfq169yuj/QMecMJgB9SuKV0hjsRDmXT9rE8JkZO0pOW2f4zVYSYZvoJCN0M3VQgsVIF/+SW/5r31d4pHv1LvA1U5qNq3+Kz1U3iKOK+4Ds7By9GdWfwK9Mun1ZDhrhYPE3P2/iPQ==
+    next
+    edit "dgu"
+        set type password
+        set passwd ENC BGPmiIWhNF9tX4/z2b0BOXon+t2YV0MxIm8oRDcilu/miyaSFN/28KX8ieORgbOQcICbks7feHmeg1TkQs5xcmxQuO5JMEBp7ui7C9REwuxURV1MRoV9fFRvJFhLokSojrNO7n6KiCdTlKXBjIa8gjFIl5KoPJU3loh+GTa1s9xVg/7j67P1J/9hHtlQxnfqArIi3w==
+    next
+    edit "fbo"
+        set type password
+        set passwd ENC v7RJGP340V2aw9/grfwXfCwB6L143R6Rzh4+OcAeQCZsSZ2BL3TT1g7/cZGuU+k8wEIkMe7F5fODKPft71K3G3yI5vmciyxFF2OAat09/Hikk4Nt7o0VS2iTv5y2fsTZkFmtOOuAG3nn/RTBi+9HEp+9MBhNG/LXmr8TZD8BmFvl4To8Gzo0RhDD9fHe4Jstdbqdjg==
+    next
+    edit "yha"
+        set type password
+        set passwd ENC xZ7wG4BbMVZyfLWOzZJOtbpgSp9YS4FPILqNnrjd995Oc+8ncbcdxlMxTyC+pAJGvPMEUdyWZaDmj+oRGKMJ5lUFqQFbd/DLeo6/hNQg+uk3dSyKcAyjnrgZBrkjWRkwygjo8SWVArbc1xfQ1V7iiCIp35rmNmwbYoDAiFiAa/vmNjDfoXv792lZT17sX30KFKyAfQ==
+    next
+    edit "jan"
+        set type password
+        set passwd ENC dbtaezNOwAaSVJ5HN2Pl4fpYir5UzXajK6X5SX6Yp0a4tNyvUsPXC45JRch5Ytme8KTTSII/B9gVR8WSMawssXr0BaQBd1lMKMFcTz20Gi5/ot07oirKVCZ+ECZLUPyePLp3a5+Rgv3ddXtfhPU4EKRVJA7Gt2z3vDSeGXV6YmtfDBU8nm5/WTw/C+XUwQnajyBJxQ==
+    next
+    edit "dpo"
+        set type password
+        set passwd ENC pQuDp0u6I4CpvHsO9SvAkIfV9Lyzrh6jWJu8ms+h088XmkwfIB+fAEh1ILK1iORs3svRZtvxb9VHMIpN1NiZ0hBYU+Ix9cpFHpGix+SSe/uQraeVIVdgJx+hi00a6g0D5Ag0Bw/l+qNF5af/hLVgLp6ED/S0Guk1FzQyCpBajFAlLrivaqVWDceMvMZPAS54/obHgA==
+    next
+    edit "fge"
+        set type password
+        set passwd ENC eWH03fSl12YwTwrsivK6Xw042+vclUlSiBmJDhfh+9q5QIraP/0DRt3styHIVOGEQ60jXzCvNmEqUfTf8HSwAsvVWYCHLNyg15ncUPMyF+5MlQdTagc5esB0u//iEotHjtJdJfG88NwGY0RCjvpvHdgI922Y0N5mbv95AfT9UufXaCZEfJUis30lpcc/84o160yTeg==
+    next
+    edit "rbo"
+        set type password
+        set passwd ENC aWH03fSl12YwTwrsivK6Xw042+vclUlSiBmJDhfh+9q5QIraP/0DRt3styHIVOGEQ60jXzCvNmEqUfTf8HSwAsvVWYCHLNyg15ncUPMyF+5MlQdTagc5esB0u//iEotHjtJdJfG88NwGY0RCjvpvHdgI922Y0N5mbv95AfT9UufXaCZEfJUis30lpcc/84o160yTeg==
+    next
+end
+
+config user group
+    edit "grp_ffn-sslvpn"
+        set member "dgu" "dpo" "fbo" "jan" "rst" "yha" "fge" "rbo"
+    next
+end
+# setup local users and groups (end)
+
+# basic settings ssl vpn (start)
+config vpn ssl web portal
+    delete full-access
+    delete tunnel-access
+    delete web-access
+    edit "none"
+        set web-mode enable
+        set limit-user-logins enable
+        set user-bookmark disable
+        set display-connection-tools disable
+        set display-history disable
+        set display-status disable
+        set heading "SSL-VPN Dummypage"
+    next
+end
+
+config vpn ssl settings
+    set sslv3 disable
+    set servercert "Fortinet_Factory"
+    set algorithm high
+    set idle-timeout 3600
+    set auth-timeout 43200
+    set tunnel-ip-pools "net_sslvpn"
+    set port 443
+    set source-interface "internet"
+    set source-address "all"
+    set source-address6 "all"
+    set default-portal "none"
+end
+# basic settings ssl vpn (end)
+
+# setup wf-standard (start)
 config webfilter profile
+rename monitor-all to wf_standard
     edit wf_standard
-		config override
+        config override
             set ovrd-user-group ""
         end
-		config web     
+        config web
             set log-search enable
         end
-		config ftgd-wf
+        unset comment
+        config ftgd-wf
             set options http-err-detail redir-block
-			set category-override 140 141
-			config filters
+            config filters
                 edit 1
-                    set category 26
-                    set action block
+                    set category 1
                 next
                 edit 2
-                    set category 61
-                    set action block
+                    set category 3
                 next
                 edit 3
-                    set category 86
-                    set action block
+                    set category 4
                 next
                 edit 4
+                    set category 5
+                next
+                edit 5
+                    set category 6
+                next
+                edit 6
+                    set category 12
+                next
+                edit 7
+                    set category 59
+					set action block
+                next
+                edit 8
+                    set category 62
+                next
+                edit 9
+                    set category 83
+                next
+                edit 10
+                    set category 2
+                next
+                edit 11
+                    set category 7
+                next
+                edit 12
+                    set category 8
+                next
+                edit 13
+                    set category 9
+                next
+                edit 14
+                    set category 11
+                next
+                edit 15
+                    set category 13
+                next
+                edit 16
+                    set category 14
+					set action block
+                next
+                edit 17
+                    set category 15
+                next
+                edit 18
+                    set category 16
+                next
+                edit 19
+                    set category 57
+                next
+                edit 20
+                    set category 63
+                next
+                edit 21
+                    set category 64
+                next
+                edit 22
+                    set category 65
+                next
+                edit 23
+                    set category 66
+                next
+                edit 24
+                    set category 67
+                next
+                edit 25
+                    set category 19
+                next
+                edit 26
+                    set category 24
+                next
+                edit 27
+                    set category 25
+                next
+                edit 28
+                    set category 72
+                next
+                edit 29
+                    set category 75
+                next
+                edit 30
+                    set category 76
+                next
+                edit 31
+                    set category 26
+					set action block
+                next
+                edit 32
+                    set category 61
+					set action block
+                next
+                edit 33
+                    set category 86
+					set action block
+                next
+                edit 34
+                    set category 17
+                next
+                edit 35
+                    set category 18
+                next
+                edit 36
+                    set category 20
+                next
+                edit 37
+                    set category 23
+                next
+                edit 38
+                    set category 28
+                next
+                edit 39
+                    set category 29
+                next
+                edit 40
+                    set category 30
+                next
+                edit 41
+                    set category 33
+                next
+                edit 42
+                    set category 34
+                next
+                edit 43
+                    set category 35
+                next
+                edit 44
+                    set category 36
+                next
+                edit 45
+                    set category 37
+                next
+                edit 46
+                    set category 38
+                next
+                edit 47
+                    set category 39
+                next
+                edit 48
+                    set category 40
+                next
+                edit 49
+                    set category 42
+                next
+                edit 50
+                    set category 44
+                next
+                edit 51
+                    set category 46
+                next
+                edit 52
+                    set category 47
+                next
+                edit 53
+                    set category 48
+                next
+                edit 54
+                    set category 54
+                next
+                edit 55
+                    set category 55
+                next
+                edit 56
+                    set category 58
+                next
+                edit 57
+                    set category 68
+                next
+                edit 58
+                    set category 69
+                next
+                edit 59
+                    set category 70
+                next
+                edit 60
+                    set category 71
+                next
+                edit 61
+                    set category 77
+                next
+                edit 62
+                    set category 78
+                next
+                edit 63
+                    set category 79
+                next
+                edit 64
+                    set category 80
+                next
+                edit 65
+                    set category 82
+                next
+                edit 66
+                    set category 85
+                next
+                edit 67
+                    set category 87
+                next
+                edit 68
+                    set category 31
+                next
+                edit 69
+                    set category 41
+                next
+                edit 70
+                    set category 43
+                next
+                edit 71
+                    set category 49
+                next
+                edit 72
+                    set category 50
+                next
+                edit 73
+                    set category 51
+                next
+                edit 74
+                    set category 52
+                next
+                edit 75
+                    set category 53
+                next
+                edit 76
+                    set category 56
+                next
+                edit 77
+                    set category 81
+                next
+                edit 78
+                    set category 84
+                next
+                edit 79
+                next
+				edit 0
                     set category 88
                     set action block
                 next
-                edit 7
-                    set action block
-                next
-                edit 6
+                edit 0
                     set category 89
                 next
-                edit 8
+                edit 0
                     set category 140
                 next
-                edit 9
+                edit 0
                     set category 141
                     set action block
                 next
             end
+            set category-override 140 141
         end
-        unset comment
-		unset log-all-url
-        unset web-content-log        
-        unset web-filter-activex-log      
-        unset web-filter-command-block-log   
+        unset log-all-url
+        unset web-content-log
+        unset web-filter-activex-log
+        unset web-filter-command-block-log
         unset web-filter-cookie-log
         unset web-filter-applet-log
         unset web-filter-jscript-log
@@ -53,10 +647,174 @@ config webfilter profile
         unset web-filter-vbs-log
         unset web-filter-unknown-log
         unset web-filter-referer-log
-        unset web-filter-cookie-removal-log    
+        unset web-filter-cookie-removal-log
         unset web-url-log
         unset web-invalid-domain-log
         unset web-ftgd-err-log
         unset web-ftgd-quota-usage
-	next
+    next
 end
+# setup wf-standard (end)
+
+# setup antivirus (start)
+config antivirus profile
+    edit "av_standard"
+        set inspection-mode proxy
+        config http
+            set options scan
+            set emulator enable
+        end
+        config ftp
+            set options scan
+            set emulator enable
+        end
+        config imap
+            set options scan
+            set emulator enable
+        end
+        config pop3
+            set options scan
+            set emulator enable
+        end
+        config smtp
+            set options scan
+            set emulator enable
+        end
+        config mapi
+            set options scan
+            set emulator enable
+        end
+        config nntp
+            set emulator enable
+        end
+    next
+end
+# setup antivirus (end)
+
+# setup proxy-options (start)
+config firewall profile-protocol-options
+    edit "po_standard"
+            config http
+                set ports 80
+                set options clientcomfort
+                set comfort-interval 1
+                set comfort-amount 1024
+                unset post-lang
+            end
+            config ftp
+                set ports 21
+                set options clientcomfort
+                set comfort-interval 1
+                set comfort-amount 1024
+            end
+            config imap
+                set ports 143
+                unset options
+            end
+            config mapi
+                set ports 135
+                unset options
+            end
+            config pop3
+                set ports 110
+                unset options
+            end
+            config smtp
+                set ports 25
+                unset options
+            end
+            config nntp
+                set ports 119
+                unset options
+            end
+            config im
+                unset options
+            end
+            config dns
+                set ports 53
+            end
+    next
+end
+# setup proxy-options (end)
+
+# setup ssl-inspection (start)
+config firewall ssl-ssh-profile
+    edit "pos_cert-only"
+        set comment "SSL handshake inspection."
+            config https
+                set ports 443
+                set status certificate-inspection
+            end
+            config ftps
+                set ports 990
+                set status disable
+            end
+            config imaps
+                set ports 993
+                set status disable
+            end
+            config pop3s
+                set ports 995
+                set status disable
+            end
+            config smtps
+                set ports 465
+                set status disable
+            end
+    next
+end
+# setup ssl-inspection (end)
+
+# setup central-management (start)
+config system central-management
+    set type none
+end
+# setup central-management (end)
+
+# setup local-in-policy (start)
+config firewall local-in-policy
+    edit 0
+        set intf "internet"
+        set srcaddr "all"
+        set dstaddr "all"
+        set action accept
+        set service "PING" "IKE" "ESP" "HTTPS" "fortisslvpn"
+        set schedule "always"
+    next
+    edit 0
+        set intf "internet"
+        set srcaddr "grp_ffn-support" "grp_forti-support"
+        set dstaddr "all"
+        set action accept
+        set service "SSH" "fortiadmin" "ALL_ICMP"
+        set schedule "always"
+    next
+    edit 0
+        set intf "internet"
+        set srcaddr "all"
+        set dstaddr "all"
+        set service "ALL"
+        set schedule "always"
+    next
+end
+# setup local-in-policy (end)
+
+# config blackhole routes (start)
+config router static
+    edit 0
+        set dst 10.0.0.0 255.0.0.0
+        set distance 200
+        set blackhole enable
+    next
+    edit 0
+        set dst 192.168.0.0 255.255.0.0
+        set distance 200
+        set blackhole enable
+    next
+    edit 0
+        set dst 172.16.0.0 255.240.0.0
+        set distance 200
+        set blackhole enable
+    next
+end
+# config blackhole routes (end)

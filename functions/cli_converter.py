@@ -29,7 +29,7 @@ def convert_command(input_file, input_folder) -> []:
 
     for line in fileinput.input(source):
         line = re.sub(r'"', '', line)
-        if '#' in line:
+        if ('#' in line and 'gui-default-policy-columns' not in line):
             # skip comments
             continue
         if 'config' in line:
@@ -125,9 +125,10 @@ def convert_command(input_file, input_folder) -> []:
                 cbody = '{'
             if 'member' in line or 'srcintf' in line or 'dstintf' in line or 'srcaddr' in line or 'dstaddr' in line \
                     or 'service' in line or 'tunnel-ip-pools' in line \
-                    or ('category' in line and 'category-override' not in line and 'webfilter' not in cpath) \
-                    or 'source-interface' in line \
-                    or 'source-address' in line or 'interface' in line or 'source-address6' in line:
+                    or ('category' in line and 'category-override' not in line and 'webfilter' not in cpath
+                        and 'firewall.service' not in cpath) \
+                    or 'source-interface' in line or 'source-address' in line or 'source-address6' in line \
+                    or ('interface' in line and 'associated-interface' not in line):
                 # complex object
                 first = line.split()[1]
                 second = line.split(first)[1]
@@ -189,7 +190,7 @@ def convert_command(input_file, input_folder) -> []:
                 cbody = cbody + ',{'
                 inner_edit = False
             else:
-                if 'firewall/policy' in cpath or 'firewall/local-in-policy' in cpath:# or 'webfilter/profile' in cpath:
+                if 'firewall/policy' in cpath or 'firewall/local-in-policy' in cpath:
                     cbody = '{\'json\':' + cbody + '}'
                 cmd.append(Command(cpath, cbody, capi, caction, cname))
                 if 'null' in cbody:
