@@ -1,6 +1,6 @@
 import subprocess
 import threading
-import info_collector
+from info_collector import InfoCollector
 import logging
 from PyQt5.QtWidgets import QWidget, QPushButton, QLabel, QGridLayout, QTextEdit
 from PyQt5.QtGui import QColor
@@ -108,7 +108,8 @@ class Info(QWidget):
         self.btn_abort.setEnabled(True)
         self.output_append('black', 'START RUN')
         # self.update_status(353, 261, 78, 14)
-        info_collector.start_info(self.output_append)
+        collector = InfoCollector(self.output_append)
+        collector.start()
         self.btn_start.setEnabled(True)
         self.btn_abort.setEnabled(False)
 
