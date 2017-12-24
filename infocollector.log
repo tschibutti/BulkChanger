@@ -1,33 +1,12 @@
-2017-12-16 15:04:21 INFO config: load config from file
-2017-12-16 15:04:21 INFO devices: using folder as source
-2017-12-16 15:04:21 INFO devices: collected all firewalls from folder -> found 2 firewalls
-2017-12-16 15:04:21 INFO sslvpn: collected all profiles -> found 2 profiles
-2017-12-16 15:04:23 INFO ******************************************************************
-2017-12-16 15:04:23 INFO IP: 192.168.8.2	 Port:8443	 Customer: Florian One
-2017-12-16 15:04:24 INFO executor: no accesspoints found
-2017-12-16 15:04:24 INFO ******************************************************************
-2017-12-16 15:04:24 INFO IP: 192.168.8.2	 Port:8443	 Customer: Florian Two
-2017-12-16 15:04:24 WARNING devices: found duplicate, remove from list
+2017-12-24 10:51:12 INFO config: load config from file
+2017-12-24 10:51:12 INFO devices: using config file as source
+2017-12-24 10:51:12 INFO devices: found 1 firewalls
+2017-12-24 10:51:12 INFO sslvpn: collected all profiles -> found 2 profiles
+2017-12-24 10:51:12 INFO ******************************************************************
+2017-12-24 10:51:12 INFO IP: 192.168.8.2	 Port:8443	 Customer: Config File
+2017-12-24 10:51:13 WARNING executor: fortimanager check not supported
+2017-12-24 10:51:13 INFO executor: no accesspoints found
 
-*********************************************
-*	Total	Success		Failed	Duplicates	*
-*	2		1			0		1			*
-*********************************************
-
-Please check the following devices manually:
-*********************************************
-*	Total	Success		Failed	Duplicates	*
-*	1		0			1		0			*
-*********************************************
-
-Please check the following devices manually:
-Config File,192.168.8.2,8443	Because: private ip and no sslvpn profile
-*********************************************
-*	Total	Success		Failed	Duplicates	*
-*	1		1			0		0			*
-*********************************************
-
-Please check the following devices manually:
 *********************************************
 *	Total	Success		Failed	Duplicates	*
 *	1		1			0		0			*

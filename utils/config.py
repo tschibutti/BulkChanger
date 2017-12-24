@@ -4,7 +4,7 @@ from utils.singleton import Singleton
 
 class Config(metaclass=Singleton):
     def __init__(self):
-        file_path = 'config.ini'
+        file_path = 'C:/BulkChanger/config.ini'
         logging.info('config: load config from file')
         self.configParser = configparser.ConfigParser()
         try:

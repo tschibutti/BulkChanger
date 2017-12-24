@@ -107,7 +107,10 @@ class Info(QWidget):
         self.btn_start.setEnabled(False)
         self.btn_abort.setEnabled(True)
         self.output_append('black', 'START RUN')
-        self.update_status(353, 261, 78, 14)
+        # self.update_status(353, 261, 78, 14)
+        info_collector.start_info(self.output_append)
+        self.btn_start.setEnabled(True)
+        self.btn_abort.setEnabled(False)
 
     def update_status(self, total, success, failed, duplicates):
         self.txt_total.setText('Total: ' + str(total))
@@ -126,22 +129,5 @@ class Info(QWidget):
             self.output_area.setTextColor(QColor(0, 0, 0))
         self.output_area.append(text)
 
-    def start_info(self):
-        # VARIABLES
-        devices = []
-        sslprofile = []
-        sslconnected = False
-        failed_devices = []
-        success_devices = []
-        duplicates = 0
-        sslvpn_user = None
-        sslvpn_password = None
-        self.output_append('green', 'Georg was here!')
 
-        # LOG FILE
-        logging.basicConfig(filemode='w', filename='C:/BulkChanger/bulkchanger.log',
-                            level=logging.INFO, format='%(asctime)s %(levelname)s %(message)s',
-                            datefmt='%Y-%m-%d %H:%M:%S')
-        if Config().log_level == 'debug':
-            logging.getLogger().setLevel(logging.DEBUG)
 

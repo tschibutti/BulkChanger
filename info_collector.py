@@ -3,7 +3,8 @@ import getpass
 from functions import csv_output, customers, executor, sslvpn
 from utils.config import Config
 
-def start_info():
+def start_info(append_callback):
+# def start_info():
     # VARIABLES
     devices = []
     sslprofile = []
@@ -15,7 +16,7 @@ def start_info():
     sslvpn_password = None
 
     # LOG FILE
-    logging.basicConfig(filemode='w', filename='C:/BulkChanger/bulkchanger.log',
+    logging.basicConfig(filemode='w', filename='C:/BulkChanger/infocollector.log',
                         level=logging.INFO, format='%(asctime)s %(levelname)s %(message)s',
                         datefmt='%Y-%m-%d %H:%M:%S')
     if Config().log_level == 'debug':
@@ -40,19 +41,19 @@ def start_info():
 
     # COLLECT SSL VPN PROFILES:
     sslprofile = sslvpn.collect()
-    sslvpn.connect('185.75.154.2', '443', 'fge', '0101_Laura')
 
     # ASK FOR SURE
-    decision = input('are you sure to collect information (y/n): ').upper()
-    if decision != 'Y':
-        print('canceled by user...')
-        logging.warning('collector: canceled by user')
-        exit()
+    # decision = input('are you sure to collect information (y/n): ').upper()
+    # if decision != 'Y':
+    #     print('canceled by user...')
+    #     logging.warning('collector: canceled by user')
+    #     exit()
 
     # START EXECUTION
     i = 0
     while i < len(devices):
         print('Current device: ' + devices[i].customer)
+        append_callback('green', devices[i].customer)
         logging.info('******************************************************************')
         logging.info('IP: ' + devices[i].ip + '\t Port:' + devices[i].port + '\t Customer: ' + devices[i].customer)
         if devices[i].check_ip():
@@ -119,7 +120,7 @@ def start_info():
     executor.run_summary(len(devices), failed_devices, duplicates)
 
     print('check log file for details')
-    exit()
+    # exit()
 
 
 if __name__ == '__main__':
