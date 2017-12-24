@@ -1,2 +1,2 @@
 Kundenname;IP-Adresse;Port;Seriennummer;Firmware;FortiCare;FortiGuard;AV-DB;FortiManager;Local-in-policy;Uptime;SSIDs;AP-Name;AP-Serials;AP-Firmware
-Config File;192.168.8.2;8443;FWF50E3U16004464;v5.4.5;expired;expired;40.00759;True;False;;None;None;None;None
+Config File;192.168.8.2;8443;FWF60C3G10000351;v5.2.12;unavailable;expired;16.00560;unknown;False;;None;None;None;None

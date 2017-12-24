@@ -20,6 +20,7 @@ class Config(metaclass=Singleton):
         self.input_folder = self.configParser['System']['input_folder']
         self.output_folder = self.configParser['System']['output_folder']
         self.backup_folder = self.configParser['System']['backup_folder']
+        self.sslvpn_folder = self.configParser['System']['sslvpn_folder']
         self.firewall_user = self.configParser['System']['firewall_user']
         self.firewall_password = self.configParser['System']['firewall_password']
         self.firewall_ip = self.configParser['System']['firewall_ip']

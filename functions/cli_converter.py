@@ -32,6 +32,13 @@ def convert_command(input_file, input_folder) -> []:
         if ('#' in line and 'gui-default-policy-columns' not in line):
             # skip comments
             continue
+        if 'execute update-now' in line:
+            cpath = 'system/fortiguard/update'
+            cbody = ''
+            capi = 'monitor'
+            caction = 'execute'
+            cname = ''
+            cmd.append(Command(cpath, cbody, capi, caction, cname))
         if 'config' in line:
             line = re.findall(r'\S+', line)
             if line.__len__() == 2:
@@ -55,15 +62,11 @@ def convert_command(input_file, input_folder) -> []:
                     else:
                         cpath = cpath + '/'
                         cpath = cpath + entry
-                if 'vpn/ssl' in cpath:
-                    cpath = re.sub(r'vpn/ssl', 'vpn.ssl', cpath)
-                    cpath = re.sub(r'/web/portal', '.web/portal', cpath)
-                if 'vpn/certificate' in cpath:
-                    cpath = re.sub(r'vpn/certificate', 'vpn.certificate', cpath)
-                if 'firewall/service' in cpath:
-                    cpath = re.sub(r'firewall/service', 'firewall.service', cpath)
-                if 'application/casi' in cpath:
-                    cpath = re.sub(r'application/casi', 'application.casi', cpath)
+
+                if len(cpath.split("/")) > 2:
+                    cpath = cpath.replace("/", ".", 1)
+                if len(cpath.split("/")) > 2:
+                    cpath = cpath.replace("/", ".", 1)
         if 'delete' in line:
             cname = line.split()[1]
             caction = 'delete'
@@ -128,7 +131,7 @@ def convert_command(input_file, input_folder) -> []:
                     or ('category' in line and 'category-override' not in line and 'webfilter' not in cpath
                         and 'firewall.service' not in cpath) \
                     or 'source-interface' in line or 'source-address' in line or 'source-address6' in line \
-                    or ('interface' in line and 'associated-interface' not in line):
+                    or ('interface' in line and 'associated-interface' not in line and 'SSL VPN' not in line):
                 # complex object
                 first = line.split()[1]
                 second = line.split(first)[1]
@@ -239,4 +242,22 @@ def print_command(cmd):
     j = 0
     while j < len(cmd):
         print('commands: ' + cmd[j].body)
+        j = j + 1
+
+def v52_marshalling(cmd):
+    logging.debug('command: marshalling for 5.2 befor execution')
+    j = 0
+    while j < len(cmd):
+        if cmd[j].body != '':
+            cmd[j].body = '{\'json\':' + cmd[j].body + '}'
+        j = j + 1
+
+
+def v52_unmarshalling(cmd):
+    logging.debug('command: unmarshalling for 5.2 after execution')
+    j = 0
+    while j < len(cmd):
+        if cmd[j].body != '':
+            cmd[j].body = cmd[j].body[:-1]
+            cmd[j].body = cmd[j].body[8:]
         j = j + 1

@@ -1,10 +1,12 @@
 import csv
+import os
 import logging
+import time
 from utils.config import Config
 
 
-def save_info(devices):
-    file = Config().output_folder + '/output.csv'
+def save_info(devices, filename):
+    file = Config().output_folder + '/' + filename
     try:
         with open(file, 'w') as csvfile:
             header = ['Kundenname', 'IP-Adresse', 'Port', 'Seriennummer', 'Firmware', 'FortiCare', 'FortiGuard',
@@ -26,4 +28,7 @@ def save_info(devices):
                 i += 1
             csvfile.close()
     except IOError:
-        logging.error('csv: file is in use')
+        logging.error('csv: file is in use, terminate excel')
+        os.system('taskkill /f /im excel.exe')
+        time.sleep(2)
+        save_info(devices, 'output.csv')

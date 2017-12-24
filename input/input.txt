@@ -1,4 +1,1 @@
-# global settings (start)
-config system global
-    set admintimeout 240
-end
+execute update-now

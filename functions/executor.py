@@ -9,8 +9,7 @@ from utils.config import Config
 def run_command(device, cmd):
     i = 0
     while i < len(cmd):
-        # req = device.session.get(
-        #     'https://' + device.ip + ':' + device.port + '/api/v2/cmdb/webfilter/profile/wf_standard-backup')
+        # req = device.session.get('https://' + device.ip + ':' + device.port + '/api/v2/cmdb/firewall/policy/1')
         # print(req)
         # rjson = req.json()
         # print(rjson)
@@ -26,6 +25,8 @@ def run_command(device, cmd):
             run_config(device, cmd[i])
         elif 'upload' in cmd[i].action:
             run_upload(device, cmd[i])
+        elif 'execute' in cmd[i].action:
+            run_execute(device, cmd[i])
         else:
             logging.error('executor: error with the command')
         i += 1
@@ -48,6 +49,10 @@ def run_rename(device, cmd):
                              cmd.api + '/' + cmd.path + '?vdom=root', data=cmd.body)
     check_req(req)
 
+def run_execute(device, cmd):
+    req = device.session.post('https://' + device.ip + ':' + device.port + '/api/v2/' +
+                              cmd.api + '/' + cmd.path + '?vdom=root')
+    check_req(req)
 
 def run_upload(device, cmd):
     logging.warning('executor: certificate upload is not supported yet')
@@ -141,7 +146,10 @@ def collect_info(device):
     if device.firmware[1:4] == '5.4':
         req = device.session.get(
             'https://' + device.ip + ':' + device.port + '/api/v2/monitor/system/csf-fgt-info/select?vdom=root')
-        rjson = req.json()
+        try:
+            rjson = req.json()
+        except:
+            logging.error('executor: unknown response for request')
         try:
             device.vdom_mode = rjson['results']['vdom_mode']
         except KeyError:
@@ -153,58 +161,106 @@ def collect_info(device):
     # COLLECT FORTIGUARD INFO
     if device.firmware[1:4] == '5.2':
         req = device.session.get('https://' + device.ip + ':' + device.port + '/p/system/widget/license_info/')
-        rjson = req.json()
-        device.forticare = 'unknown'
-        if rjson['antivirus']['expiry_date'] == '':
-            device.fortiguard = 'expired'
-        else:
-            device.fortiguard = rjson['antivirus']['expiry_date']
-        device.av_db = str(rjson['antivirus']['major_version'])
-        device.av_db = device.av_db + '.00' + str(rjson['antivirus']['minor_version'])
+        try:
+            rjson = req.json()
+        except:
+            logging.error('executor: unknown response for request')
+        try:
+            if rjson['antivirus']['expiry_date'] == '':
+                device.fortiguard = 'expired'
+                device.forticare = 'unavailable'
+            else:
+                device.fortiguard = rjson['antivirus']['expiry_date']
+                device.forticare = device.fortiguard
+        except:
+            device.fortiguard = 'unavailable'
+            device.forticare = 'unavailable'
+        try:
+            device.av_db = str(rjson['antivirus']['major_version'])
+            device.av_db = device.av_db + '.00' + str(rjson['antivirus']['minor_version'])
+        except:
+            device.av_db = 'unavailable'
     if device.firmware[1:4] == '5.4':
         req = device.session.get('https://' + device.ip + ':' + device.port + '/p/system/widget/license_info/')
-        rjson = req.json()
-        if rjson['forticare']['support'] == None: # todo maybe solve warning
-            device.forticare = 'expired'
-        else:
-            device.forticare = rjson['forticare']['support']['hardware']['expiry_date']
-        if rjson['antivirus']['expiry_date'] == '':
-            device.fortiguard = 'expired'
-        else:
-            device.fortiguard = rjson['antivirus']['expiry_date']
-        device.av_db = str(rjson['antivirus']['version'])
+        try:
+            rjson = req.json()
+        except:
+            logging.error('executor: unknown response for request')
+        try:
+            if rjson['forticare']['support'] == None:
+                device.forticare = 'expired'
+            else:
+                device.forticare = rjson['forticare']['support']['hardware']['expiry_date']
+        except:
+            device.forticare = 'unavailable'
+        try:
+            if rjson['antivirus']['expiry_date'] == '':
+                device.fortiguard = 'expired'
+            else:
+                device.fortiguard = rjson['antivirus']['expiry_date']
+        except:
+            device.fortiguard = 'unavailable'
+        try:
+            device.av_db = str(rjson['antivirus']['version'])
+        except:
+            device.av_db = 'unavailable'
     if device.firmware[1:4] == '5.6':
         req = device.session.get('https://' + device.ip + ':' + device.port + '/api/v2/monitor/license/status/')
-        rjson = req.json()
-        if rjson['results']['forticare']['support'] == None:
-            device.forticare = 'expired'
-        else:
-            device.forticare = rjson['results']['forticare']['support']['hardware']['expires']
-            device.forticare = time.strftime("%d.%m.%Y", time.localtime(device.forticare))
-        if rjson['results']['antivirus']['expires'] == '':
-            device.fortiguard = 'expired'
-        else:
-            device.fortiguard = rjson['results']['antivirus']['expires']
-            device.fortiguard = time.strftime("%d.%m.%Y", time.localtime(device.fortiguard))
-        device.av_db = str(rjson['results']['antivirus']['version'])
+        try:
+            rjson = req.json()
+        except:
+            logging.error('executor: unknown response for request')
+        try:
+            if rjson['results']['forticare']['support'] == None:
+                device.forticare = 'expired'
+            else:
+                device.forticare = rjson['results']['forticare']['support']['hardware']['expires']
+                device.forticare = time.strftime("%d.%m.%Y", time.localtime(device.forticare))
+        except:
+            device.forticare = 'unavailable'
+        try:
+            if rjson['results']['antivirus']['expires'] == '':
+                device.fortiguard = 'expired'
+            else:
+                device.fortiguard = rjson['results']['antivirus']['expires']
+                device.fortiguard = time.strftime("%d.%m.%Y", time.localtime(device.fortiguard))
+        except:
+            device.fortiguard = 'unavailable'
+        try:
+            device.av_db = str(rjson['results']['antivirus']['version'])
+        except:
+            device.av_db = 'unavailable'
 
     # COLLECT Local-in-policy
-    if device.firmware[1:4] == '5.4':
+    if device.firmware[1:4] == '5.2' or device.firmware[1:4] == '5.4' or device.firmware[1:4] == '5.6':
         req = device.session.get('https://' + device.ip + ':' + device.port + '/api/v2/cmdb/firewall/local-in-policy')
-        rjson = req.json()
-        if rjson['results'] != []:
-            device.local_in = True
+        try:
+            rjson = req.json()
+        except:
+            logging.error('executor: unknown response for request')
+        try:
+            if rjson['results'] != []:
+                device.local_in = True
+        except:
+            device.local_in = 'unavailable'
 
 def vdom_check(device):
     req = device.session.get(
         'https://' + device.ip + ':' + device.port + '/api/v2/monitor/system/vdom-resource/select?global=1')
-    rjson = req.json()
+    try:
+        rjson = req.json()
+    except:
+        logging.error('executor: unknown response for request')
     # print(rjson)
 
 
 def fmg_check(device):
+    # not supported for 5.2
     req = device.session.get('https://' + device.ip + ':' + device.port + '/api/v2/monitor/system/fortimanager/status')
-    rjson = req.json()
+    try:
+        rjson = req.json()
+    except:
+        logging.error('executor: unknown response for request')
     if device.firmware[1:4] == '5.2':
         logging.warning('executor: fortimanager check not supported')
         device.fortimanager = 'unknown'
@@ -248,14 +304,14 @@ def check_req(request):
     except:
         logging.error('executor: unknown response for request')
 
-def run_summary(total, failed_devices, skipped_devices = None):
+def run_summary(total, failed_devices, duplicates, skipped_devices = None):
     if skipped_devices == None:
         f = open('C:/BulkChanger/infocollector.log', 'a')
-        f.write('\n*********************************')
-        f.write('\n*\tTotal\tSuccess\t\tFailed\t*')
-        f.write('\n*\t' + str(total) + '\t\t' + str(total - len(failed_devices)) + '\t\t' +
-                '\t' + str(len(failed_devices)) + '\t\t*')
-        f.write('\n*********************************\n\nPlease check the following devices manually:')
+        f.write('\n*********************************************')
+        f.write('\n*\tTotal\tSuccess\t\tFailed\tDuplicates\t*')
+        f.write('\n*\t' + str(total+duplicates) + '\t\t' + str(total - len(failed_devices)) + '\t\t' +
+                '\t' + str(len(failed_devices)) + '\t\t'+ str(duplicates) + '\t\t\t*')
+        f.write('\n*********************************************\n\nPlease check the following devices manually:')
         i = 0
         while i < len(failed_devices):
             f.write('\n' + str(failed_devices[i].customer) + ',' + str(failed_devices[i].ip) + ',' + str(
@@ -264,11 +320,13 @@ def run_summary(total, failed_devices, skipped_devices = None):
         f.close()
     else:
         f = open('C:/BulkChanger/bulkchanger.log', 'a')
-        f.write('\n*********************************************')
-        f.write('\n*\tTotal\tSuccess\t\tFailed\tSkipped\t\t*')
-        f.write('\n*\t' + str(total) + '\t\t' + str(total - len(failed_devices) - len(skipped_devices)) + '\t\t' +
-                '\t' + str(len(failed_devices)) + '\t\t' + str(len(skipped_devices)) + '\t\t\t*')
-        f.write('\n*********************************************\n\nPlease check the following devices manually:')
+        f.write('\n\n*********************************************************')
+        f.write('\n*\tTotal\tSuccess\t\tFailed\tSkipped\t\tDuplicates\t*')
+        f.write('\n*\t' + str(total+duplicates) + '\t\t' + str(total - len(failed_devices) - len(skipped_devices))
+                + '\t\t' + '\t' + str(len(failed_devices)) + '\t\t' + str(len(skipped_devices)) + '\t\t\t'
+                + str(duplicates) + '\t\t\t*')
+        f.write('\n*********************************************************\n\n'
+                'Please check the following devices manually:')
         i = 0
         while i < len(failed_devices):
             f.write('\n' + str(failed_devices[i].customer) + ',' + str(failed_devices[i].ip) + ',' + str(

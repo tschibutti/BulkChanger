@@ -1,17 +1,27 @@
 import logging
 import getpass
-from functions import csv_output, customers, executor
+from functions import csv_output, customers, executor, sslvpn
 from utils.config import Config
 
-if __name__ == '__main__':
+def start_info():
     # VARIABLES
     devices = []
+    sslprofile = []
+    sslconnected = False
     failed_devices = []
     success_devices = []
+    duplicates = 0
+    sslvpn_user = None
+    sslvpn_password = None
 
     # LOG FILE
-    logging.basicConfig(filemode='w', filename='C:/BulkChanger/infocollector.log',
-                        level=logging.INFO, format='%(asctime)s %(levelname)s %(message)s', datefmt='%Y-%m-%d %H:%M:%S')
+    logging.basicConfig(filemode='w', filename='C:/BulkChanger/bulkchanger.log',
+                        level=logging.INFO, format='%(asctime)s %(levelname)s %(message)s',
+                        datefmt='%Y-%m-%d %H:%M:%S')
+    if Config().log_level == 'debug':
+        logging.getLogger().setLevel(logging.DEBUG)
+
+
     # CONFIG FILE
     if (Config().firewall_user == '') or (Config().firewall_password == ''):
         # USER AND PASSWORD INPUT
@@ -26,6 +36,18 @@ if __name__ == '__main__':
 
     # GET FIREWALL LIST
     devices = customers.collect_firewalls()
+    customers.remove_umlaut(devices)
+
+    # COLLECT SSL VPN PROFILES:
+    sslprofile = sslvpn.collect()
+    sslvpn.connect('185.75.154.2', '443', 'fge', '0101_Laura')
+
+    # ASK FOR SURE
+    decision = input('are you sure to collect information (y/n): ').upper()
+    if decision != 'Y':
+        print('canceled by user...')
+        logging.warning('collector: canceled by user')
+        exit()
 
     # START EXECUTION
     i = 0
@@ -34,27 +56,41 @@ if __name__ == '__main__':
         logging.info('******************************************************************')
         logging.info('IP: ' + devices[i].ip + '\t Port:' + devices[i].port + '\t Customer: ' + devices[i].customer)
         if devices[i].check_ip():
-            logging.warning('ip-check: private ip, cannot handle right now')
-            failed_devices.append(devices[i])
-            devices[i].reason = 'private ip address range'
-            i += 1
-            continue
+            # check if local device
+            devices[i].ping()
+            if devices[i].online == 1:
+                index = sslvpn.match(devices[i].customer, sslprofile)
+                if index == -1:
+                    logging.warning('sslvpn: found no matching ssl profile')
+                    failed_devices.append(devices[i])
+                    devices[i].reason = 'private ip and no sslvpn profile'
+                    i += 1
+                    continue
+                if sslvpn_user == None and sslvpn_password == None:
+                    # CREDENTIALS FOR SSL VPN
+                    sslvpn_user = input('sslvpn username: ')
+                    sslvpn_password = input('sslvpn password: ')
+                    # sslvpn_password = getpass.getpass(prompt='sslvpn password: ', stream=None)
+                sslvpn.connect(sslprofile[index].ip, sslprofile[index].port, sslvpn_user, sslvpn_password)
+                sslconnected = True
         devices[i].ping()
         if devices[i].online == 1:
             logging.warning('ping: device is offline, skip device')
             failed_devices.append(devices[i])
-            devices[i].reason = 'no ping resonse'
+            devices[i].reason = 'no ping response'
             i += 1
             continue
         logging.debug('ping: device is online')
         devices[i].login(firewall_user, firewall_password)
-        if devices[i].connected == 0:
+        if not devices[i].connected:
             devices[i].reason = 'wrong username or password'
-        elif devices[i].connected == 1:
-            devices[i].firmware_check()
-        if devices[i].connected == 0:
+        if not devices[i].connected:
             failed_devices.append(devices[i])
             i += 1
+            continue
+        if devices[i].check_duplicate(devices, i):
+            devices.remove(devices[i])
+            duplicates += 1
             continue
         executor.fmg_check(devices[i])
         # executor.perform_backup(devices[i])
@@ -68,11 +104,23 @@ if __name__ == '__main__':
             continue
         logging.debug('ping: device is still online')
         success_devices.append(devices[i])
+        if sslconnected:
+            sslconnected = False
+            sslvpn.disconnect()
+        # Info.update_status(len(devices), len(success_devices), len(failed_devices), duplicates)
         i += 1
 
+    if sslconnected:
+        sslconnected = False
+        sslvpn.disconnect()
+
     # PRINT RESULT
-    csv_output.save_info(devices)
-    executor.run_summary(len(devices), failed_devices)
+    csv_output.save_info(devices, 'output.csv')
+    executor.run_summary(len(devices), failed_devices, duplicates)
 
     print('check log file for details')
     exit()
+
+
+if __name__ == '__main__':
+    start_info()

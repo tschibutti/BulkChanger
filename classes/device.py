@@ -1,6 +1,7 @@
 import os
 import urllib3
 import re
+import socket
 from requests import RequestException
 from requests import Session
 from json import JSONDecodeError
@@ -85,15 +86,20 @@ class Device:
         self.online = os.system('ping -n 1 -w 1500 ' + self.ip + ' > nul')
 
     def check_ip(self) -> bool:
-        numbers = sum(c.isdigit() for c in self.ip)
-        if numbers < 4:
-            return False
+        # Check for DNS Names
+        alpha = sum(c.isalpha() for c in self.ip)
+        if alpha > 2:
+            try:
+                self.ip = socket.gethostbyname(self.ip)
+            except:
+                logging.warning('ip-check: cannot resolve dns name to ip')
+                return True
 
         first_octet = int(self.ip.split('.')[0])
         second_octet = int(self.ip.split('.')[1])
         third_octet = int(self.ip.split('.')[2])
         if second_octet == 168 and third_octet == 8:
-            return False
+            return True
         if first_octet == 10:
             return True
         if first_octet == 172 and second_octet >= 16 and second_octet <= 31:
@@ -101,3 +107,13 @@ class Device:
         if first_octet == 192 and second_octet == 168:
             return True
         return False
+
+    def check_duplicate(self, devices, index):
+        i = 0
+        while i < index:
+            if (devices[i].serial == devices[index].serial):
+                logging.warning('devices: found duplicate, remove from list')
+                return True
+            i += 1
+        return False
+

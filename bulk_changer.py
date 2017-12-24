@@ -1,7 +1,8 @@
 import logging
 import os
 import getpass
-from functions import cli_converter, customers, executor
+import re
+from functions import cli_converter, customers, executor, sslvpn
 from utils.config import Config
 
 
@@ -19,12 +20,17 @@ if __name__ == '__main__':
     failed_devices = []
     skipped_devices = []
     success_devices = []
+    duplicates = 0
     cmd = []
+    sslvpn_user = None
+    sslvpn_password = None
 
     # LOG FILE
-    logging.basicConfig(filemode='w',
-                        filename='C:/BulkChanger/bulkchanger.log',
-                        level=logging.DEBUG, format='%(asctime)s %(levelname)s %(message)s', datefmt='%Y-%m-%d %H:%M:%S')
+    logging.basicConfig(filemode='w', filename='C:/BulkChanger/bulkchanger.log',
+                        level=logging.INFO, format='%(asctime)s %(levelname)s %(message)s',
+                        datefmt='%Y-%m-%d %H:%M:%S')
+    if Config().log_level.upper() == 'DEBUG':
+        logging.getLogger().setLevel(logging.DEBUG)
 
     # CONFIG FILE
     if (Config().firewall_user == '') or (Config().firewall_password == ''):
@@ -33,7 +39,7 @@ if __name__ == '__main__':
         firewall_user = input('firewall username: ')
         # not working with PyCharm
         firewall_password = getpass.getpass(prompt='Firewall password: ', stream=None)
-        #firewall_password = input('firewall password: ')
+        # firewall_password = input('firewall password: ')
     else:
         firewall_user = Config().firewall_user
         firewall_password = Config().firewall_password
@@ -41,10 +47,20 @@ if __name__ == '__main__':
     # GET FIREWALL LIST
     devices = customers.collect_firewalls()
 
+    # COLLECT SSL VPN PROFILES:
+    sslprofile = sslvpn.collect()
+
     # GET COMMANDS
     cmd = cli_converter.convert_command('input.txt', Config().input_folder)
-    # print_cmd(cmd)
+    print_cmd(cmd)
     # exit()
+
+    # ASK FOR SURE
+    # decision = input('are you sure to change configuration (y/n): ').upper()
+    # if decision != 'Y':
+    #     print('canceled by user...')
+    #     logging.warning('collector: canceled by user')
+    #     exit()
 
     # START EXECUTION
     i = 0
@@ -53,11 +69,23 @@ if __name__ == '__main__':
         logging.info('******************************************************************')
         logging.info('IP: ' + devices[i].ip + '\t Port:' + devices[i].port + '\t Customer: ' + devices[i].customer)
         if devices[i].check_ip():
-            logging.warning('ip-check: private ip, cannot handle right now')
-            failed_devices.append(devices[i])
-            devices[i].reason = 'private ip address range'
-            i += 1
-            continue
+            # check if local device
+            devices[i].ping()
+            if devices[i].online == -1:
+                index = sslvpn.match(devices[i].customer, sslprofile)
+                if index == -1:
+                    logging.warning('sslvpn: found no matching ssl profile')
+                    failed_devices.append(devices[i])
+                    devices[i].reason = 'private ip and no sslvpn profile'
+                    i += 1
+                    continue
+                if sslvpn_user == None and sslvpn_password == None:
+                    # CREDENTIALS FOR SSL VPN
+                    sslvpn_user = input('sslvpn username: ')
+                    sslvpn_password = input('sslvpn password: ')
+                    # sslvpn_password = getpass.getpass(prompt='sslvpn password: ', stream=None)
+                sslvpn.connect(sslprofile[index].ip, sslprofile[index].port, sslvpn_user, sslvpn_password)
+                sslconnected = True
         devices[i].ping()
         if devices[i].online == 1:
             logging.warning('ping: device is offline, skip device')
@@ -75,13 +103,22 @@ if __name__ == '__main__':
             failed_devices.append(devices[i])
             i += 1
             continue
+        if devices[i].check_duplicate(devices, i):
+            devices.remove(devices[i])
+            duplicates += 1
+            continue
         executor.fmg_check(devices[i])
-        if devices[i].fortimanager:
+        # todo 5.2 does not support the check -> other options?
+        if devices[i].fortimanager and devices[i].fortimanager != 'unknown':
             skipped_devices.append(devices[i])
             i += 1
             continue
-        executor.perform_backup(devices[i])
+        # executor.perform_backup(devices[i])
+        if '5.2' in devices[i].firmware:
+            cli_converter.v52_marshalling(cmd)
         executor.run_command(devices[i], cmd)
+        if '5.2' in devices[i].firmware:
+            cli_converter.v52_unmarshalling(cmd)
         devices[i].logout()
         devices[i].ping()
         if devices[i].online == 1:
@@ -101,7 +138,7 @@ if __name__ == '__main__':
         logging.debug('certifiacte: source file not exist')
 
     # PRINT RESULT
-    executor.run_summary(len(devices), failed_devices, skipped_devices)
+    executor.run_summary(len(devices), failed_devices, duplicates, skipped_devices)
 
     print('check log file for details')
     exit()

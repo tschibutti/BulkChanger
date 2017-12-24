@@ -1,6 +1,7 @@
 import configparser
 import logging
 import os
+import re
 
 from classes.device import Device
 from utils.config import Config
@@ -69,6 +70,17 @@ def collect_firewalls() -> []:
         logging.error('devices: no firewalls found, abort execution')
         print('error: check log file for details')
         exit()
-    logging.info('devices: collected all firewalls from source folder')
-    logging.info('devices: found ' + str(len(devices)) + ' firewalls')
+    logging.info('devices: collected all firewalls from folder -> found ' + str(len(devices)) + ' firewalls')
     return devices
+
+
+def remove_umlaut(devices):
+    i = 0
+    while i < len(devices):
+        devices[i].customer = re.sub(r'ä', 'ae', devices[i].customer)
+        devices[i].customer = re.sub(r'ö', 'oe', devices[i].customer)
+        devices[i].customer = re.sub(r'ü', 'ue', devices[i].customer)
+        devices[i].customer = re.sub(r'Ä', 'AE', devices[i].customer)
+        devices[i].customer = re.sub(r'Ö', 'OE', devices[i].customer)
+        devices[i].customer = re.sub(r'Ü', 'UE', devices[i].customer)
+        i += 1
