@@ -57,14 +57,7 @@ class InfoCollector(QThread):
         customers.remove_umlaut(devices)
 
         # COLLECT SSL VPN PROFILES:
-        #sslprofile = sslvpn.collect()
-
-        # ASK FOR SURE
-        # decision = input('are you sure to collect information (y/n): ').upper()
-        # if decision != 'Y':
-        #     print('canceled by user...')
-        #     logging.warning('collector: canceled by user')
-        #     exit()
+        sslprofile = sslvpn.collect()
 
         # START EXECUTION
         i = 0
@@ -151,4 +144,3 @@ class InfoCollector(QThread):
 
         print('check log file for details')
         self.end_callback()
-        # exit()

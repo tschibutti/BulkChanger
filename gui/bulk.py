@@ -1,42 +1,148 @@
 import subprocess
-from PyQt5.QtWidgets import QWidget, QPushButton, QGridLayout
-
+from bulk_changer import BulkChanger
+from PyQt5.QtWidgets import QWidget, QPushButton, QLabel, QGridLayout, QTextEdit, QMessageBox
+from PyQt5.QtGui import QColor, QIcon
+from PyQt5.QtCore import QSize
 
 class Bulk(QWidget):
+
+    changer = None
+
     def __init__(self):
         super(Bulk, self).__init__()
         self.initUI()
 
     def initUI(self):
+
         self.setFixedSize(800, 500)
         self.setWindowTitle('BulkChanger by Florian Gemperle')
-
-        # Layout
-        grid = QGridLayout()
-        self.setLayout(grid)
+        app_icon = QIcon()
+        app_icon.addFile('lightning256.png', QSize(256, 256))
+        self.setWindowIcon(app_icon)
 
         # Buttons
+        self.btn_start = QPushButton('Start Run', self)
+        self.btn_start.clicked.connect(self.start_run)
+        self.btn_start.resize(self.btn_start.sizeHint())
+
         btn_config = QPushButton('Show Config', self)
-        btn_config.clicked.connect(self.showConfig)
+        btn_config.clicked.connect(self.show_config)
         btn_config.resize(btn_config.sizeHint())
-        grid.addWidget(btn_config, 0, 0)
 
         btn_b_log = QPushButton('Show BulkChanger Log', self)
-        btn_b_log.clicked.connect(self.showBulkLog)
+        btn_b_log.clicked.connect(self.show_infolog)
         btn_b_log.resize(btn_b_log.sizeHint())
-        grid.addWidget(btn_b_log, 0, 1)
 
         btn_quit = QPushButton('Quit', self)
-        btn_quit.clicked.connect(self.close)
+        btn_quit.clicked.connect(self.quit_gui)
         btn_quit.resize(btn_quit.sizeHint())
-        grid.addWidget(btn_quit, 0, 2)
 
-    def showConfig(self):
+        self.btn_abort = QPushButton('Abort Run', self)
+        self.btn_abort.clicked.connect(self.abort_run)
+        self.btn_abort.resize(self.btn_abort.sizeHint())
+        self.btn_abort.setEnabled(False)
+
+        # Text Area
+        self.output_area = QTextEdit(self)
+        self.output_area.setFixedSize(750, 375)
+        self.output_area.setReadOnly(True)
+
+        # Status
+        self.txt_total = QLabel('Total: 0', self)
+        self.txt_success = QLabel('Success: 0', self)
+        self.txt_failed = QLabel('Failed: 0', self)
+        self.txt_skipped = QLabel('Skipped: 0', self)
+        self.txt_duplicates = QLabel('Duplicates: 0', self)
+
+        self.txt_total.setStyleSheet('color: black; font-size: 14px; font: bold')
+        self.txt_success.setStyleSheet('color: green; font-size: 14px; font: bold')
+        self.txt_failed.setStyleSheet('color: red; font-size: 14px; font: bold')
+        self.txt_skipped.setStyleSheet('color: #8d44ad; font-size: 14px; font: bold')
+        self.txt_duplicates.setStyleSheet('color: blue; font-size: 14px; font: bold')
+
+        # Layout
+        grid = QGridLayout(self)
+        grid_status = QGridLayout()
+        grid_output = QGridLayout()
+        grid_buttons = QGridLayout()
+
+        grid.addLayout(grid_status, 0, 0)
+        grid.addLayout(grid_output, 1, 0)
+        grid.addLayout(grid_buttons, 2, 0)
+
+        grid_status.addWidget(self.btn_start, 0, 0)
+        grid_status.addWidget(self.txt_total, 0, 1)
+        grid_status.addWidget(self.txt_success, 0, 2)
+        grid_status.addWidget(self.txt_failed, 0, 3)
+        grid_status.addWidget(self.txt_skipped, 0, 4)
+        grid_status.addWidget(self.txt_duplicates, 0, 5)
+
+        grid_output.addWidget(self.output_area, 0, 0)
+
+        grid_buttons.addWidget(btn_config, 3, 0)
+        grid_buttons.addWidget(btn_b_log, 3, 1)
+        grid_buttons.addWidget(self.btn_abort, 3, 2)
+        grid_buttons.addWidget(btn_quit, 3, 3)
+        self.setLayout(grid)
+
+    def show_config(self):
         program = 'C:/Program Files (x86)/Notepad++/notepad++.exe'
         file = 'C:/BulkChanger/config.ini'
         subprocess.Popen([program, file])
 
-    def showBulkLog(self):
+    def show_infolog(self):
         program = 'C:/Program Files (x86)/Notepad++/notepad++.exe'
         file = 'C:/BulkChanger/bulkchanger.log'
         subprocess.Popen([program, file])
+
+    def start_run(self):
+        start_msg = "Are you sure?"
+        reply = QMessageBox.question(self, 'Message', start_msg, QMessageBox.Yes, QMessageBox.No)
+        if reply == QMessageBox.Yes:
+            self.btn_start.setEnabled(False)
+            self.btn_abort.setEnabled(True)
+            self.output_append('black', 'START RUN')
+            self.changer = BulkChanger(self.output_append, self.update_status, self.end_run)
+            self.changer.start()
+
+    def end_run(self):
+        self.btn_start.setEnabled(True)
+        self.btn_abort.setEnabled(False)
+        self.output_append('black', 'RUN FINISHED')
+        self.output_append('black', '---------------------------------------------------------------------------')
+
+    def abort_run(self):
+        self.btn_abort.setEnabled(False)
+        self.btn_start.setEnabled(True)
+        self.changer.terminate()
+        # self.changer.quit()
+        self.output_append('black', 'RUN ABORTED')
+        self.output_append('black', '---------------------------------------------------------------------------')
+
+    def update_status(self, total, success, failed, skipped, duplicates):
+        self.txt_total.setText('Total: ' + str(total))
+        self.txt_success.setText('Success: ' + str(success))
+        self.txt_failed.setText('Failed: ' + str(failed))
+        self.txt_skipped.setText('Skipped: ' + str(skipped))
+        self.txt_duplicates.setText('Duplicates: ' + str(duplicates))
+
+    def quit_gui(self):
+        self.update_status(0, 0, 0, 0, 0)
+        self.output_area.clear()
+        self.close()
+
+    def output_append(self, color, text):
+        if color.upper() == 'RED':
+            self.output_area.setTextColor(QColor(255, 0, 0))
+        elif color.upper() == 'GREEN':
+            self.output_area.setTextColor(QColor(0, 128, 0))
+        elif color.upper() == 'BLUE':
+            self.output_area.setTextColor(QColor(0, 0, 250))
+        elif color.upper() == 'PURPLE':
+            self.output_area.setTextColor(QColor(141, 68, 173))
+        else:
+            self.output_area.setTextColor(QColor(0, 0, 0))
+        self.output_area.append(text)
+
+
+

@@ -1,6 +1,5 @@
 import subprocess
 from info_collector import InfoCollector
-import logging
 from PyQt5.QtWidgets import QWidget, QPushButton, QLabel, QGridLayout, QTextEdit, QMessageBox
 from PyQt5.QtGui import QColor, QIcon
 from PyQt5.QtCore import QSize
@@ -54,11 +53,6 @@ class Info(QWidget):
         self.txt_failed = QLabel('Failed: 0', self)
         self.txt_duplicates = QLabel('Duplicates: 0', self)
 
-        self.txt_total.setObjectName('txt_total')
-        self.txt_success.setObjectName('txt_success')
-        self.txt_failed.setObjectName('txt_failed')
-        self.txt_duplicates.setObjectName('txt_duplicates')
-
         self.txt_total.setStyleSheet('color: black; font-size: 14px; font: bold')
         self.txt_success.setStyleSheet('color: green; font-size: 14px; font: bold')
         self.txt_failed.setStyleSheet('color: red; font-size: 14px; font: bold')
@@ -99,7 +93,7 @@ class Info(QWidget):
         subprocess.Popen([program, file])
 
     def start_run(self):
-        start_msg = "Are you sure you want collect informations?"
+        start_msg = "Are you sure?"
         reply = QMessageBox.question(self, 'Message', start_msg, QMessageBox.Yes, QMessageBox.No)
         if reply == QMessageBox.Yes:
             self.btn_start.setEnabled(False)

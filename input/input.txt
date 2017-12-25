@@ -1,1 +1,7 @@
-execute update-now
+config system admin
+    edit "dpo"
+        set accprofile "super_admin"
+        set vdom "root"
+        set password ENC AK16D3CKqjt+2aM/xf2ieZJcDoFdx2MhS5TxQWngTJi61s=
+    next
+end
