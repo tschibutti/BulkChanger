@@ -1,7 +1,6 @@
 import logging
 import os
 import getpass
-import re
 from functions import cli_converter, customers, executor, sslvpn
 from utils.config import Config
 
@@ -53,7 +52,7 @@ if __name__ == '__main__':
     # GET COMMANDS
     cmd = cli_converter.convert_command('input.txt', Config().input_folder)
     print_cmd(cmd)
-    # exit()
+    exit()
 
     # ASK FOR SURE
     # decision = input('are you sure to change configuration (y/n): ').upper()

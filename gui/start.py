@@ -1,6 +1,7 @@
 import sys
 from PyQt5.QtWidgets import QWidget, QApplication, QPushButton, QGridLayout
-from PyQt5.QtCore import QThread, QObject, pyqtSignal
+from PyQt5.QtGui import QIcon
+from PyQt5.QtCore import QSize
 from gui.bulk import Bulk
 from gui.info import Info
 
@@ -12,6 +13,9 @@ class Start(QWidget):
     def initUI(self):
         self.setFixedSize(300, 300)
         self.setWindowTitle('Startscreen')
+        app_icon = QIcon()
+        app_icon.addFile('lightning256.png', QSize(256, 256))
+        self.setWindowIcon(app_icon)
 
         # Layout
         grid = QGridLayout()
@@ -34,15 +38,17 @@ class Start(QWidget):
         grid.addWidget(btn_quit)
 
     def startBulk(self):
-        self.bulk = Bulk()
-        self.bulk.show()
+        # self.bulk = Bulk()
+        bulk.show()
 
     def startInfo(self):
-        self.info = Info()
-        self.info.show()
+        # self.info = Info()
+        info.show()
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
     start = Start()
+    info = Info()
+    bulk = Bulk()
     start.show()
     sys.exit(app.exec_())

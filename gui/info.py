@@ -1,22 +1,25 @@
 import subprocess
-import threading
 from info_collector import InfoCollector
 import logging
-from PyQt5.QtWidgets import QWidget, QPushButton, QLabel, QGridLayout, QTextEdit
-from PyQt5.QtGui import QColor
-from PyQt5.QtCore import QThread, QObject,pyqtSignal
-from utils.config import Config
+from PyQt5.QtWidgets import QWidget, QPushButton, QLabel, QGridLayout, QTextEdit, QMessageBox
+from PyQt5.QtGui import QColor, QIcon
+from PyQt5.QtCore import QSize
 
 class Info(QWidget):
 
+    collector = None
 
     def __init__(self):
         super(Info, self).__init__()
         self.initUI()
 
     def initUI(self):
+
         self.setFixedSize(800, 500)
         self.setWindowTitle('InfoCollector by Florian Gemperle')
+        app_icon = QIcon()
+        app_icon.addFile('lightning256.png', QSize(256, 256))
+        self.setWindowIcon(app_icon)
 
         # Buttons
         self.btn_start = QPushButton('Start Run', self)
@@ -32,8 +35,7 @@ class Info(QWidget):
         btn_b_log.resize(btn_b_log.sizeHint())
 
         btn_quit = QPushButton('Quit', self)
-        btn_quit.clicked.connect(self.close)
-        # btn_quit.clicked.connect(self.update_status)
+        btn_quit.clicked.connect(self.quit_gui)
         btn_quit.resize(btn_quit.sizeHint())
 
         self.btn_abort = QPushButton('Abort Run', self)
@@ -96,28 +98,40 @@ class Info(QWidget):
         file = 'C:/BulkChanger/infocollector.log'
         subprocess.Popen([program, file])
 
-    def abort_run(self):
-        # logging.warning('execution: aborted by user')
-        self.btn_abort.setEnabled(False)
-        self.btn_start.setEnabled(True)
-        self.output_append('black', 'RUN ABORTED')
-
     def start_run(self):
-        # logging.info('execution: run started by user')
-        self.btn_start.setEnabled(False)
-        self.btn_abort.setEnabled(True)
-        self.output_append('black', 'START RUN')
-        # self.update_status(353, 261, 78, 14)
-        collector = InfoCollector(self.output_append)
-        collector.start()
+        start_msg = "Are you sure you want collect informations?"
+        reply = QMessageBox.question(self, 'Message', start_msg, QMessageBox.Yes, QMessageBox.No)
+        if reply == QMessageBox.Yes:
+            self.btn_start.setEnabled(False)
+            self.btn_abort.setEnabled(True)
+            self.output_append('black', 'START RUN')
+            self.collector = InfoCollector(self.output_append, self.update_status, self.end_run)
+            self.collector.start()
+
+    def end_run(self):
         self.btn_start.setEnabled(True)
         self.btn_abort.setEnabled(False)
+        self.output_append('black', 'RUN FINISHED')
+        self.output_append('black', '---------------------------------------------------------------------------')
+
+    def abort_run(self):
+        self.btn_abort.setEnabled(False)
+        self.btn_start.setEnabled(True)
+        self.collector.terminate()
+        # self.collector.quit()
+        self.output_append('black', 'RUN ABORTED')
+        self.output_append('black', '---------------------------------------------------------------------------')
 
     def update_status(self, total, success, failed, duplicates):
         self.txt_total.setText('Total: ' + str(total))
         self.txt_success.setText('Success: ' + str(success))
         self.txt_failed.setText('Failed: ' + str(failed))
         self.txt_duplicates.setText('Duplicates: ' + str(duplicates))
+
+    def quit_gui(self):
+        self.update_status(0, 0, 0, 0)
+        self.output_area.clear()
+        self.close()
 
     def output_append(self, color, text):
         if color.upper() == 'RED':

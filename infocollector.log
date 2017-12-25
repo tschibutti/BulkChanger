@@ -1,15 +1,26 @@
-2017-12-24 10:51:12 INFO config: load config from file
-2017-12-24 10:51:12 INFO devices: using config file as source
-2017-12-24 10:51:12 INFO devices: found 1 firewalls
-2017-12-24 10:51:12 INFO sslvpn: collected all profiles -> found 2 profiles
-2017-12-24 10:51:12 INFO ******************************************************************
-2017-12-24 10:51:12 INFO IP: 192.168.8.2	 Port:8443	 Customer: Config File
-2017-12-24 10:51:13 WARNING executor: fortimanager check not supported
-2017-12-24 10:51:13 INFO executor: no accesspoints found
+2017-12-25 13:07:11 INFO config: load config from file
+2017-12-25 13:07:11 INFO devices: using folder as source
+2017-12-25 13:07:11 INFO devices: collected all firewalls from folder -> found 4 firewalls
+2017-12-25 13:07:11 INFO ******************************************************************
+2017-12-25 13:07:11 INFO IP: 84.253.41.242	 Port:8443	 Customer: 3-Plan Kreuzlingen
+2017-12-25 13:07:14 WARNING login: timed out, skip device
+2017-12-25 13:07:14 INFO ******************************************************************
+2017-12-25 13:07:14 INFO IP: 213.160.33.146	 Port:8443	 Customer: 3-Plan Winterthur
+2017-12-25 13:07:16 WARNING login: timed out, skip device
+2017-12-25 13:07:16 INFO ******************************************************************
+2017-12-25 13:07:16 INFO IP: 46.14.52.210	 Port:8443	 Customer: 3-Plan Winterthur
+2017-12-25 13:07:18 WARNING login: timed out, skip device
+2017-12-25 13:07:18 INFO ******************************************************************
+2017-12-25 13:07:18 INFO IP: 82.136.65.146	 Port:8443	 Customer: ABS Personal
+2017-12-25 13:07:20 WARNING login: timed out, skip device
 
 *********************************************
 *	Total	Success		Failed	Duplicates	*
-*	1		1			0		0			*
+*	4		0			4		0			*
 *********************************************
 
 Please check the following devices manually:
+3-Plan Kreuzlingen,84.253.41.242,8443	Because: wrong username or password
+3-Plan Winterthur,213.160.33.146,8443	Because: wrong username or password
+3-Plan Winterthur,46.14.52.210,8443	Because: wrong username or password
+ABS Personal,82.136.65.146,8443	Because: wrong username or password
