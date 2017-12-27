@@ -68,9 +68,10 @@ def collect_firewalls() -> []:
             devices.append(Device(customer, fgt_ip, fgt_port))
     if not devices:
         logging.error('devices: no firewalls found, abort execution')
-        print('error: check log file for details')
-        exit()
+        return devices
+
     logging.info('devices: collected all firewalls from folder -> found ' + str(len(devices)) + ' firewalls')
+    remove_umlaut(devices)
     return devices
 
 

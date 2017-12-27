@@ -25,6 +25,7 @@ class Start(QWidget):
         btn_s_bulk = QPushButton('Start Bulk Changer', self)
         btn_s_bulk.clicked.connect(self.startBulk)
         btn_s_bulk.setFixedSize(250, 75)
+        btn_s_bulk.setAutoDefault(True)
         grid.addWidget(btn_s_bulk)
 
         btn_s_info = QPushButton('Start Info Collector', self)

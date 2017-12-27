@@ -16,14 +16,19 @@ def print_cmd(command):
 
 class BulkChanger(QThread):
 
-    def __init__(self, append_callback, status_callback, end_callback):
+    def __init__(self, append_callback, status_callback, end_callback, exception_callback):
         QThread.__init__(self)
         self.append_callback = append_callback
         self.status_callback = status_callback
         self.end_callback = end_callback
+        self.exception_callback = exception_callback
+        self.runs = True
 
     def run(self):
         self.start_bulk()
+
+    def stop(self):
+        self.runs = False
 
     def start_bulk(self):
         # VARIABLES
@@ -35,6 +40,7 @@ class BulkChanger(QThread):
         cmd = []
         sslvpn_user = None
         sslvpn_password = None
+        sslconnected = False
 
         # LOG FILE
         logging.basicConfig(filemode='w', filename='C:/BulkChanger/bulkchanger.log',
@@ -57,18 +63,27 @@ class BulkChanger(QThread):
 
         # GET FIREWALL LIST
         devices = customers.collect_firewalls()
+        if not devices:
+            self.exception_callback('devices')
+            self.stop()
 
         # COLLECT SSL VPN PROFILES:
         sslprofile = sslvpn.collect()
+        if sslprofile == None:
+            self.exception_callback('ssl vpn profile')
+            self.stop()
 
         # GET COMMANDS
         cmd = cli_converter.convert_command('input.txt', Config().input_folder)
+        if not cmd:
+            self.exception_callback('command line input')
+            self.stop()
         # print_cmd(cmd)
         # exit()
 
         # START EXECUTION
         i = 0
-        while i < len(devices):
+        while i < len(devices) and self.runs:
             print('Current device: ' + devices[i].customer)
             self.status_callback(len(devices) + duplicates, len(success_devices), len(failed_devices),
                                  len(skipped_devices), duplicates)
@@ -124,7 +139,8 @@ class BulkChanger(QThread):
                 self.append_callback('purple', devices[i].customer)
                 i += 1
                 continue
-            # executor.perform_backup(devices[i])
+            if Config().backup_enable:
+                executor.perform_backup(devices[i])
             if '5.2' in devices[i].firmware:
                 cli_converter.v52_marshalling(cmd)
             executor.run_command(devices[i], cmd)
@@ -146,6 +162,10 @@ class BulkChanger(QThread):
         self.status_callback(len(devices) + duplicates, len(success_devices), len(failed_devices),
                              len(skipped_devices), duplicates)
 
+        if sslconnected:
+            sslconnected = False
+            sslvpn.disconnect()
+
         # DELTE TEMPORARY FILES
         file = Config().input_folder + '/ca.cer'
         try:
@@ -154,7 +174,11 @@ class BulkChanger(QThread):
             logging.debug('certifiacte: source file not exist')
 
         # PRINT RESULT
-        executor.run_summary(len(devices), failed_devices, duplicates, skipped_devices)
+        executor.run_summary(len(devices), len(success_devices), failed_devices, duplicates, skipped_devices)
+
+        # REMOVE LOGGING HANDLERS
+        for handler in logging.root.handlers[:]:
+            logging.root.removeHandler(handler)
 
         print('check log file for details')
         self.end_callback()

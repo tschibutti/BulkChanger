@@ -4,21 +4,30 @@ from PyQt5.QtCore import QThread
 from functions import csv_output, customers, executor, sslvpn
 from utils.config import Config
 
-class InfoCollector(QThread):
 
+class InfoCollector(QThread):
     is_aborted = False
 
-    def __init__(self, append_callback, status_callback, end_callback):
+    def __init__(self, append_callback, status_callback, end_callback, exception_callback, fwuser, fwpassword,
+                 ssluser, sslpassword):
         QThread.__init__(self)
         self.append_callback = append_callback
         self.status_callback = status_callback
         self.end_callback = end_callback
+        self.exception_callback = exception_callback
+
+        self.runs = True
+
+        self.firewall_user = fwuser
+        self.firewall_password = fwpassword
+        self.sslvpn_user = ssluser
+        self.sslvpn_password = sslpassword
 
     def run(self):
         self.start_info()
 
     def stop(self):
-        self.is_aborted = True
+        self.runs = False
 
     def start_info(self):
         # VARIABLES
@@ -28,9 +37,7 @@ class InfoCollector(QThread):
         failed_devices = []
         success_devices = []
         duplicates = 0
-        sslvpn_user = None
-        sslvpn_password = None
-        is_aborted = False
+        sslconnected = False
 
         # LOG FILE
         logging.basicConfig(filemode='w', filename='C:/BulkChanger/infocollector.log',
@@ -39,31 +46,32 @@ class InfoCollector(QThread):
         if Config().log_level == 'debug':
             logging.getLogger().setLevel(logging.DEBUG)
 
+        # CREDENTIALS
+        if not ((Config().firewall_user == '') or (Config().firewall_password == '')):
+            self.firewall_user = Config().firewall_user
+            self.firewall_password = Config().firewall_password
 
-        # CONFIG FILE
-        if (Config().firewall_user == '') or (Config().firewall_password == ''):
-            # USER AND PASSWORD INPUT
-            print('user or password not defined in config file')
-            firewall_user = input('firewall username: ')
-            # not working with PyCharm
-            firewall_password = getpass.getpass(prompt='Firewall password: ', stream=None)
-            # firewall_password = input('firewall password: ')
-        else:
-            firewall_user = Config().firewall_user
-            firewall_password = Config().firewall_password
+        if not ((Config().sslvpn_user == '') or (Config().sslvpn_password == '')):
+            self.sslvpn_user = Config().sslvpn_user
+            self.sslvpn_password = Config().sslvpn_password
 
         # GET FIREWALL LIST
         devices = customers.collect_firewalls()
-        customers.remove_umlaut(devices)
+        if not devices:
+            self.exception_callback('devices')
+            self.stop()
 
         # COLLECT SSL VPN PROFILES:
         sslprofile = sslvpn.collect()
+        if sslprofile == None:
+            self.exception_callback('ssl vpn profile')
+            self.stop()
 
         # START EXECUTION
         i = 0
-        while i < len(devices):
+        while i < len(devices) and self.runs:
             print('Current device: ' + devices[i].customer)
-            self.status_callback(len(devices)+duplicates, len(success_devices), len(failed_devices), duplicates)
+            self.status_callback(len(devices) + duplicates, len(success_devices), len(failed_devices), duplicates)
             logging.info('******************************************************************')
             logging.info('IP: ' + devices[i].ip + '\t Port:' + devices[i].port + '\t Customer: ' + devices[i].customer)
             if devices[i].check_ip():
@@ -78,12 +86,7 @@ class InfoCollector(QThread):
                         self.append_callback('red', devices[i].customer)
                         i += 1
                         continue
-                    if sslvpn_user == None and sslvpn_password == None:
-                        # CREDENTIALS FOR SSL VPN
-                        sslvpn_user = input('sslvpn username: ')
-                        sslvpn_password = input('sslvpn password: ')
-                        # sslvpn_password = getpass.getpass(prompt='sslvpn password: ', stream=None)
-                    sslvpn.connect(sslprofile[index].ip, sslprofile[index].port, sslvpn_user, sslvpn_password)
+                    sslvpn.connect(sslprofile[index].ip, sslprofile[index].port, self.sslvpn_user, self.sslvpn_password)
                     sslconnected = True
             devices[i].ping()
             if devices[i].online == 1:
@@ -94,7 +97,7 @@ class InfoCollector(QThread):
                 i += 1
                 continue
             logging.debug('ping: device is online')
-            devices[i].login(firewall_user, firewall_password)
+            devices[i].login(self.firewall_user, self.firewall_password)
             if not devices[i].connected:
                 devices[i].reason = 'wrong username or password'
             if not devices[i].connected:
@@ -108,7 +111,8 @@ class InfoCollector(QThread):
                 self.append_callback('blue', devices[i].customer)
                 continue
             executor.fmg_check(devices[i])
-            # executor.perform_backup(devices[i])
+            if Config().backup_enable.upper() == 'TRUE':
+                executor.perform_backup(devices[i])
             executor.collect_info(devices[i])
             devices[i].logout()
             devices[i].ping()
@@ -124,11 +128,9 @@ class InfoCollector(QThread):
                 sslconnected = False
                 sslvpn.disconnect()
             self.append_callback('green', devices[i].customer)
-            if self.is_aborted:
-                break
             i += 1
 
-        self.status_callback(len(devices)+duplicates, len(success_devices), len(failed_devices), duplicates)
+        self.status_callback(len(devices) + duplicates, len(success_devices), len(failed_devices), duplicates)
 
         if sslconnected:
             sslconnected = False
@@ -136,7 +138,7 @@ class InfoCollector(QThread):
 
         # PRINT RESULT
         csv_output.save_info(devices, 'output.csv')
-        executor.run_summary(len(devices), failed_devices, duplicates)
+        executor.run_summary(len(devices), len(success_devices), failed_devices, duplicates)
 
         # REMOVE LOGGING HANDLERS
         for handler in logging.root.handlers[:]:

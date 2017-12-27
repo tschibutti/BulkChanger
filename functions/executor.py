@@ -304,12 +304,12 @@ def check_req(request):
     except:
         logging.error('executor: unknown response for request')
 
-def run_summary(total, failed_devices, duplicates, skipped_devices = None):
+def run_summary(total, success, failed_devices, duplicates, skipped_devices = None):
     if skipped_devices == None:
         f = open('C:/BulkChanger/infocollector.log', 'a')
         f.write('\n*********************************************')
         f.write('\n*\tTotal\tSuccess\t\tFailed\tDuplicates\t*')
-        f.write('\n*\t' + str(total+duplicates) + '\t\t' + str(total - len(failed_devices)) + '\t\t' +
+        f.write('\n*\t' + str(total+duplicates) + '\t\t' + str(success) + '\t\t' +
                 '\t' + str(len(failed_devices)) + '\t\t'+ str(duplicates) + '\t\t\t*')
         f.write('\n*********************************************\n\nPlease check the following devices manually:')
         i = 0
@@ -322,7 +322,7 @@ def run_summary(total, failed_devices, duplicates, skipped_devices = None):
         f = open('C:/BulkChanger/bulkchanger.log', 'a')
         f.write('\n\n*********************************************************')
         f.write('\n*\tTotal\tSuccess\t\tFailed\tSkipped\t\tDuplicates\t*')
-        f.write('\n*\t' + str(total+duplicates) + '\t\t' + str(total - len(failed_devices) - len(skipped_devices))
+        f.write('\n*\t' + str(total+duplicates) + '\t\t' + str(success)
                 + '\t\t' + '\t' + str(len(failed_devices)) + '\t\t' + str(len(skipped_devices)) + '\t\t\t'
                 + str(duplicates) + '\t\t\t*')
         f.write('\n*********************************************************\n\n'

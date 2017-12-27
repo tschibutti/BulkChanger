@@ -25,7 +25,7 @@ def convert_command(input_file, input_folder) -> []:
 
     if not os.path.isfile(source):
         logging.error('command: file not found')
-        return
+        return cmd
 
     for line in fileinput.input(source):
         line = re.sub(r'"', '', line)
@@ -231,8 +231,8 @@ def convert_command(input_file, input_folder) -> []:
                 cbody = ''
     if not cmd:
         logging.error('command: error, abort execution')
-        print('error: check log file for details')
-        exit()
+        return cmd
+
     logging.info('command: converted cli command to rest api command')
     logging.info('command: parsed ' + str(len(cmd)) + ' commands')
     return cmd

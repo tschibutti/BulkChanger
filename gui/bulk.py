@@ -6,8 +6,6 @@ from PyQt5.QtCore import QSize
 
 class Bulk(QWidget):
 
-    changer = None
-
     def __init__(self):
         super(Bulk, self).__init__()
         self.initUI()
@@ -24,6 +22,7 @@ class Bulk(QWidget):
         self.btn_start = QPushButton('Start Run', self)
         self.btn_start.clicked.connect(self.start_run)
         self.btn_start.resize(self.btn_start.sizeHint())
+        self.btn_start.setAutoDefault(True)
 
         btn_config = QPushButton('Show Config', self)
         btn_config.clicked.connect(self.show_config)
@@ -102,22 +101,23 @@ class Bulk(QWidget):
             self.btn_start.setEnabled(False)
             self.btn_abort.setEnabled(True)
             self.output_append('black', 'START RUN')
-            self.changer = BulkChanger(self.output_append, self.update_status, self.end_run)
+            self.changer = BulkChanger(self.output_append, self.update_status, self.end_run, self.exception_occured)
             self.changer.start()
 
     def end_run(self):
         self.btn_start.setEnabled(True)
+        self.btn_start.setFocus()
         self.btn_abort.setEnabled(False)
         self.output_append('black', 'RUN FINISHED')
         self.output_append('black', '---------------------------------------------------------------------------')
 
     def abort_run(self):
-        self.btn_abort.setEnabled(False)
         self.btn_start.setEnabled(True)
-        self.changer.terminate()
-        # self.changer.quit()
+        self.btn_start.setFocus()
+        self.btn_abort.setEnabled(False)
+        # self.changer.terminate()
+        self.changer.stop()
         self.output_append('black', 'RUN ABORTED')
-        self.output_append('black', '---------------------------------------------------------------------------')
 
     def update_status(self, total, success, failed, skipped, duplicates):
         self.txt_total.setText('Total: ' + str(total))
@@ -130,6 +130,10 @@ class Bulk(QWidget):
         self.update_status(0, 0, 0, 0, 0)
         self.output_area.clear()
         self.close()
+
+    def exception_occured(self, reason):
+        text = 'ERROR WITH ' + reason.upper()
+        self.output_append('black', text)
 
     def output_append(self, color, text):
         if color.upper() == 'RED':

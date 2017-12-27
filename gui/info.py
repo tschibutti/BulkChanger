@@ -1,12 +1,10 @@
 import subprocess
 from info_collector import InfoCollector
-from PyQt5.QtWidgets import QWidget, QPushButton, QLabel, QGridLayout, QTextEdit, QMessageBox
+from PyQt5.QtWidgets import QWidget, QPushButton, QLabel, QGridLayout, QTextEdit, QMessageBox, QLineEdit, QDialog, QInputDialog
 from PyQt5.QtGui import QColor, QIcon
 from PyQt5.QtCore import QSize
 
 class Info(QWidget):
-
-    collector = None
 
     def __init__(self):
         super(Info, self).__init__()
@@ -20,10 +18,17 @@ class Info(QWidget):
         app_icon.addFile('lightning256.png', QSize(256, 256))
         self.setWindowIcon(app_icon)
 
+        # Variables
+        self.firewall_user = ''
+        self.firewall_password = ''
+        self.sslvpn_user = ''
+        self.sslvpn_password = ''
+
         # Buttons
         self.btn_start = QPushButton('Start Run', self)
         self.btn_start.clicked.connect(self.start_run)
         self.btn_start.resize(self.btn_start.sizeHint())
+        self.btn_start.setAutoDefault(True)
 
         btn_config = QPushButton('Show Config', self)
         btn_config.clicked.connect(self.show_config)
@@ -96,25 +101,40 @@ class Info(QWidget):
         start_msg = "Are you sure?"
         reply = QMessageBox.question(self, 'Message', start_msg, QMessageBox.Yes, QMessageBox.No)
         if reply == QMessageBox.Yes:
-            self.btn_start.setEnabled(False)
-            self.btn_abort.setEnabled(True)
-            self.output_append('black', 'START RUN')
-            self.collector = InfoCollector(self.output_append, self.update_status, self.end_run)
-            self.collector.start()
+            text, result = QInputDialog.getText(self, 'Credentials', 'FortiGate User', QLineEdit.Normal)
+            if result:
+                self.firewall_user = str(text)
+                text, result = QInputDialog.getText(self, 'Credentials', 'FortiGate Password', QLineEdit.Password)
+                if result:
+                    self.firewall_password = str(text)
+                    text, result = QInputDialog.getText(self, 'Credentials', 'SSL VPN User', QLineEdit.Normal, self.firewall_user)
+                    if result:
+                        self.sslvpn_user = str(text)
+                        text, result = QInputDialog.getText(self, 'Credentials', 'SSL VPN Password', QLineEdit.Password, self.firewall_password)
+                        if result:
+                            self.sslvpn_password = str(text)
+                            self.btn_start.setEnabled(False)
+                            self.btn_abort.setEnabled(True)
+                            self.output_append('black', 'START RUN')
+                            self.collector = InfoCollector(self.output_append, self.update_status, self.end_run,
+                                                           self.exception_occured, self.firewall_user,
+                                                           self.firewall_password, self.sslvpn_user,
+                                                           self.sslvpn_password)
+                            self.collector.start()
 
     def end_run(self):
         self.btn_start.setEnabled(True)
+        self.btn_start.setFocus()
         self.btn_abort.setEnabled(False)
         self.output_append('black', 'RUN FINISHED')
         self.output_append('black', '---------------------------------------------------------------------------')
 
     def abort_run(self):
-        self.btn_abort.setEnabled(False)
         self.btn_start.setEnabled(True)
-        self.collector.terminate()
-        # self.collector.quit()
-        self.output_append('black', 'RUN ABORTED')
-        self.output_append('black', '---------------------------------------------------------------------------')
+        self.btn_start.setFocus()
+        self.btn_abort.setEnabled(False)
+        self.collector.stop()
+        self.output_append('black', 'RUN ABORTED, please wait...')
 
     def update_status(self, total, success, failed, duplicates):
         self.txt_total.setText('Total: ' + str(total))
@@ -126,6 +146,12 @@ class Info(QWidget):
         self.update_status(0, 0, 0, 0)
         self.output_area.clear()
         self.close()
+
+    def exception_occured(self, reason):
+        text = 'ERROR WITH ' + reason.upper()
+        self.output_append('black', text)
+        self.btn_start.setEnabled(True)
+        self.btn_abort.setEnabled(False)
 
     def output_append(self, color, text):
         if color.upper() == 'RED':

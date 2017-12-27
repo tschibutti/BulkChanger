@@ -97,9 +97,6 @@ class Device:
 
         first_octet = int(self.ip.split('.')[0])
         second_octet = int(self.ip.split('.')[1])
-        third_octet = int(self.ip.split('.')[2])
-        if second_octet == 168 and third_octet == 8:
-            return True
         if first_octet == 10:
             return True
         if first_octet == 172 and second_octet >= 16 and second_octet <= 31:

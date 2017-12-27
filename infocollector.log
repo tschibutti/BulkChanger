@@ -1,10 +1,11 @@
-2017-12-25 16:04:58 INFO devices: using config file as source
-2017-12-25 16:04:58 INFO devices: found 1 firewalls
-2017-12-25 16:04:58 INFO sslvpn: collected all profiles -> found 2 profiles
-2017-12-25 16:04:58 INFO ******************************************************************
-2017-12-25 16:04:58 INFO IP: 192.168.8.2	 Port:8443	 Customer: Config File
-2017-12-25 16:04:59 WARNING executor: fortimanager check not supported
-2017-12-25 16:04:59 INFO executor: no accesspoints found
+2017-12-26 15:38:20 INFO config: load config from file
+2017-12-26 15:38:20 INFO devices: using config file as source
+2017-12-26 15:38:20 INFO devices: found 1 firewalls
+2017-12-26 15:38:21 INFO sslvpn: collected all profiles -> found 2 profiles
+2017-12-26 15:38:21 INFO ******************************************************************
+2017-12-26 15:38:21 INFO IP: 192.168.8.2	 Port:8443	 Customer: Config File
+2017-12-26 15:38:22 WARNING executor: fortimanager check not supported
+2017-12-26 15:38:22 INFO executor: no accesspoints found
 
 *********************************************
 *	Total	Success		Failed	Duplicates	*

@@ -59,7 +59,7 @@ def collect() -> []:
 
     if customer.__len__() != ip.__len__():
         logging.error('sslvpn: cannot collect sslvpn profiles, abort execution')
-        exit()
+        return None
 
     i = 0
     while i < customer.__len__():
@@ -68,7 +68,7 @@ def collect() -> []:
 
     if not sslprofile:
         logging.error('sslvpn: no profiles found, abort execution')
-        print('error: check log file for details')
-        exit()
+        return None
+
     logging.info('sslvpn: collected all profiles -> found ' + str(len(sslprofile)) + ' profiles')
     return sslprofile
