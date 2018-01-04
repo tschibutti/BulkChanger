@@ -1,16 +1,21 @@
-import csv
+import sys
 import os
+import csv
 import logging
 import time
+import subprocess
 from utils.config import Config
 
 
-def save_info(devices, filename):
-    file = Config().output_folder + '/' + filename
+def save_info(devices):
+    if getattr(sys, 'frozen', False):
+        output_file = os.path.join(os.path.abspath(os.path.dirname(sys.executable)), 'fortigate.csv')
+    else:
+        output_file = os.path.join(os.path.abspath(os.path.dirname(__file__)), '..', 'fortigate.csv')
     try:
-        with open(file, 'w') as csvfile:
+        with open(output_file, 'w') as csvfile:
             header = ['Kundenname', 'IP-Adresse', 'Port', 'Seriennummer', 'Firmware', 'FortiCare', 'FortiGuard',
-                      'AV-DB', 'FortiManager', 'Local-in-policy', 'Uptime', 'SSIDs', 'AP-Name', 'AP-Serials', 'AP-Firmware']
+                      'AV-DB', 'FortiManager', 'VDOM', 'Local-in-policy', 'SSIDs', 'AP-Name', 'AP-Serials', 'AP-Firmware']
             writer = csv.DictWriter(csvfile, fieldnames=header, delimiter=';', lineterminator='\n')
             writer.writeheader()
 
@@ -20,8 +25,9 @@ def save_info(devices, filename):
                                  'Port': devices[i].port, 'Seriennummer': devices[i].serial,
                                  'Firmware': devices[i].firmware, 'FortiCare': devices[i].forticare,
                                  'FortiGuard': devices[i].fortiguard, 'AV-DB': devices[i].av_db,
-                                 'FortiManager': devices[i].fortimanager, 'Local-in-policy': devices[i].local_in,
-                                 'Uptime': devices[i].uptime, 'SSIDs': ','.join(map(str, set(devices[i].ssid))),
+                                 'FortiManager': devices[i].fortimanager, 'VDOM': devices[i].vdom_mode,
+                                 'Local-in-policy': devices[i].local_in,
+                                 'SSIDs': ','.join(map(str, set(devices[i].ssid))),
                                  'AP-Name': ','.join(map(str, devices[i].ap_name)),
                                  'AP-Serials': ','.join(map(str, devices[i].ap_serial)),
                                  'AP-Firmware': ','.join(map(str, devices[i].ap_firmware))})
@@ -29,6 +35,6 @@ def save_info(devices, filename):
             csvfile.close()
     except IOError:
         logging.error('csv: file is in use, terminate excel')
-        os.system('taskkill /f /im excel.exe')
+        subprocess.call('taskkill /f /im excel.exe >> null', shell=True)
         time.sleep(2)
-        save_info(devices, 'output.csv')
+        save_info(devices)

@@ -1,8 +1,11 @@
 import subprocess
+import os
+import sys
 from info_collector import InfoCollector
-from PyQt5.QtWidgets import QWidget, QPushButton, QLabel, QGridLayout, QTextEdit, QMessageBox, QLineEdit, QDialog, QInputDialog
+from PyQt5.QtWidgets import QWidget, QPushButton, QLabel, QGridLayout, QTextEdit, QLineEdit, QInputDialog, QScrollBar
 from PyQt5.QtGui import QColor, QIcon
 from PyQt5.QtCore import QSize
+from utils.config import Config
 
 class Info(QWidget):
 
@@ -11,18 +14,31 @@ class Info(QWidget):
         self.initUI()
 
     def initUI(self):
-
         self.setFixedSize(800, 500)
         self.setWindowTitle('InfoCollector by Florian Gemperle')
+        if getattr(sys, 'frozen', False):
+            app_icon_path = os.path.join(os.path.abspath(os.path.dirname(sys.executable)), 'icon.png')
+        else:
+            app_icon_path = os.path.join(os.path.abspath(os.path.dirname(__file__)), 'icon.png')
         app_icon = QIcon()
-        app_icon.addFile('lightning256.png', QSize(256, 256))
+        app_icon.addFile(app_icon_path, QSize(256, 256))
         self.setWindowIcon(app_icon)
 
-        # Variables
-        self.firewall_user = ''
-        self.firewall_password = ''
-        self.sslvpn_user = ''
-        self.sslvpn_password = ''
+        if getattr(sys, 'frozen', False):
+            self.info_log_path = os.path.join(os.path.abspath(os.path.dirname(sys.executable)), 'infocollector.log')
+        else:
+            self.info_log_path = os.path.join(os.path.abspath(os.path.dirname(__file__)), '..', 'infocollector.log')
+        if not os.path.isfile(self.info_log_path):
+            temp_file = open(self.info_log_path, 'w+')
+            temp_file.close()
+
+        if getattr(sys, 'frozen', False):
+            self.config_file_path = os.path.join(os.path.abspath(os.path.dirname(sys.executable)), 'config.ini')
+        else:
+            self.config_file_path = os.path.join(os.path.abspath(os.path.dirname(__file__)), '..', 'config.ini')
+        if not os.path.isfile(self.config_file_path):
+            temp_file = open(self.config_file_path, 'w+')
+            temp_file.close()
 
         # Buttons
         self.btn_start = QPushButton('Start Run', self)
@@ -51,6 +67,8 @@ class Info(QWidget):
         self.output_area = QTextEdit(self)
         self.output_area.setFixedSize(750, 375)
         self.output_area.setReadOnly(True)
+        self.output_scroller = QScrollBar(self)
+        self.output_area.setVerticalScrollBar(self.output_scroller)
 
         # Status
         self.txt_total = QLabel('Total: 0', self)
@@ -89,38 +107,35 @@ class Info(QWidget):
 
     def show_config(self):
         program = 'C:/Program Files (x86)/Notepad++/notepad++.exe'
-        file = 'C:/BulkChanger/config.ini'
-        subprocess.Popen([program, file])
+        subprocess.Popen([program, self.config_file_path])
 
     def show_infolog(self):
         program = 'C:/Program Files (x86)/Notepad++/notepad++.exe'
-        file = 'C:/BulkChanger/infocollector.log'
-        subprocess.Popen([program, file])
+        subprocess.Popen([program, self.info_log_path])
 
     def start_run(self):
-        start_msg = "Are you sure?"
-        reply = QMessageBox.question(self, 'Message', start_msg, QMessageBox.Yes, QMessageBox.No)
-        if reply == QMessageBox.Yes:
-            text, result = QInputDialog.getText(self, 'Credentials', 'FortiGate User', QLineEdit.Normal)
+        text, result = QInputDialog.getText(self, 'Credentials', 'FortiGate User', QLineEdit.Normal)
+        if result:
+            self.firewall_user = str(text)
+            text, result = QInputDialog.getText(self, 'Credentials', 'FortiGate Password', QLineEdit.Password)
             if result:
-                self.firewall_user = str(text)
-                text, result = QInputDialog.getText(self, 'Credentials', 'FortiGate Password', QLineEdit.Password)
+                self.firewall_password = str(text)
+                text, result = QInputDialog.getText(self, 'Credentials', 'SSL VPN User', QLineEdit.Normal,
+                                                    self.firewall_user)
                 if result:
-                    self.firewall_password = str(text)
-                    text, result = QInputDialog.getText(self, 'Credentials', 'SSL VPN User', QLineEdit.Normal, self.firewall_user)
+                    self.sslvpn_user = str(text)
+                    text, result = QInputDialog.getText(self, 'Credentials', 'SSL VPN Password', QLineEdit.Password,
+                                                        self.firewall_password)
                     if result:
-                        self.sslvpn_user = str(text)
-                        text, result = QInputDialog.getText(self, 'Credentials', 'SSL VPN Password', QLineEdit.Password, self.firewall_password)
-                        if result:
-                            self.sslvpn_password = str(text)
-                            self.btn_start.setEnabled(False)
-                            self.btn_abort.setEnabled(True)
-                            self.output_append('black', 'START RUN')
-                            self.collector = InfoCollector(self.output_append, self.update_status, self.end_run,
-                                                           self.exception_occured, self.firewall_user,
-                                                           self.firewall_password, self.sslvpn_user,
-                                                           self.sslvpn_password)
-                            self.collector.start()
+                        self.sslvpn_password = str(text)
+                        self.btn_start.setEnabled(False)
+                        self.btn_abort.setEnabled(True)
+                        self.output_append('black', 'START RUN')
+                        self.collector = InfoCollector(self.output_append, self.update_status, self.end_run,
+                                                       self.exception_occured, self.firewall_user,
+                                                       self.firewall_password, self.sslvpn_user,
+                                                       self.sslvpn_password)
+                        self.collector.start()
 
     def end_run(self):
         self.btn_start.setEnabled(True)
@@ -163,6 +178,7 @@ class Info(QWidget):
         else:
             self.output_area.setTextColor(QColor(0, 0, 0))
         self.output_area.append(text)
+        self.output_scroller.setValue(self.output_scroller.maximum())
 
 
 

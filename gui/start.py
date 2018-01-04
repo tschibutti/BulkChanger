@@ -1,4 +1,5 @@
 import sys
+import os
 from PyQt5.QtWidgets import QWidget, QApplication, QPushButton, QGridLayout
 from PyQt5.QtGui import QIcon
 from PyQt5.QtCore import QSize
@@ -13,8 +14,12 @@ class Start(QWidget):
     def initUI(self):
         self.setFixedSize(300, 300)
         self.setWindowTitle('Startscreen')
+        if getattr(sys, 'frozen', False):
+            app_icon_path = os.path.join(os.path.abspath(os.path.dirname(sys.executable)), 'icon.png')
+        else:
+            app_icon_path = os.path.join(os.path.abspath(os.path.dirname(__file__)), 'icon.png')
         app_icon = QIcon()
-        app_icon.addFile('lightning256.png', QSize(256, 256))
+        app_icon.addFile(app_icon_path, QSize(256, 256))
         self.setWindowIcon(app_icon)
 
         # Layout

@@ -17,13 +17,13 @@ def collect_firewalls() -> []:
         devices.append(Device('Config File', Config().firewall_ip, Config().firewall_port))
         logging.info('devices: found ' + str(len(devices)) + ' firewalls')
         return devices
-    try:
-        os.chdir(Config().devices_folder)
-    except FileNotFoundError:
+
+    if not os.path.exists(Config().devices_folder):
         logging.error('devices: folder not found')
         return
-
-    for fileName in os.listdir("."):
+    
+    os.chdir(Config().devices_folder)
+    for fileName in os.listdir('.'):
         if '#nobulk' in fileName:
             continue
         if "FGT" in fileName:

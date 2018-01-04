@@ -46,7 +46,8 @@ def collect() -> []:
     subprocess.call(program, shell=True)
 
     # Collect Profiles
-    tree = ET.parse('C:/forticlient/FortiClient_Profile.xml')
+    file = Config().sslvpn_folder + '/FortiClient_Profile.xml'
+    tree = ET.parse(file)
     root = tree.getroot()
     for name in root.iter('name'):
         if name.text is not None:

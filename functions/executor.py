@@ -33,8 +33,6 @@ def run_command(device, cmd):
 
 
 def run_delete(device, cmd):
-    # req = device.session.delete('https://' + device.ip + ':' + device.port + '/api/v2/' +
-    #                            cmd.api + '/' + cmd.path + '/' + cmd.name + '?vdom=root')
     if check_existence(device, cmd) == 404:
         logging.warning('executor: object not exist, nothing to delete')
     elif check_existence(device, cmd) == 200:
@@ -143,20 +141,7 @@ def collect_info(device):
                 x += 1
 
     # COLLECT VDOM INFO
-    if device.firmware[1:4] == '5.4':
-        req = device.session.get(
-            'https://' + device.ip + ':' + device.port + '/api/v2/monitor/system/csf-fgt-info/select?vdom=root')
-        try:
-            rjson = req.json()
-        except:
-            logging.error('executor: unknown response for request')
-        try:
-            device.vdom_mode = rjson['results']['vdom_mode']
-        except KeyError:
-            logging.warning('executor: vdom check failed')
-            device.vdom_mode = False
-        if device.vdom_mode:
-            vdom_check(device)
+
 
     # COLLECT FORTIGUARD INFO
     if device.firmware[1:4] == '5.2':
@@ -168,18 +153,18 @@ def collect_info(device):
         try:
             if rjson['antivirus']['expiry_date'] == '':
                 device.fortiguard = 'expired'
-                device.forticare = 'unavailable'
+                device.forticare = 'unknown'
             else:
                 device.fortiguard = rjson['antivirus']['expiry_date']
                 device.forticare = device.fortiguard
         except:
-            device.fortiguard = 'unavailable'
-            device.forticare = 'unavailable'
+            device.fortiguard = 'unknown'
+            device.forticare = 'unknown'
         try:
             device.av_db = str(rjson['antivirus']['major_version'])
             device.av_db = device.av_db + '.00' + str(rjson['antivirus']['minor_version'])
         except:
-            device.av_db = 'unavailable'
+            device.av_db = 'unknown'
     if device.firmware[1:4] == '5.4':
         req = device.session.get('https://' + device.ip + ':' + device.port + '/p/system/widget/license_info/')
         try:
@@ -192,18 +177,18 @@ def collect_info(device):
             else:
                 device.forticare = rjson['forticare']['support']['hardware']['expiry_date']
         except:
-            device.forticare = 'unavailable'
+            device.forticare = 'unknown'
         try:
             if rjson['antivirus']['expiry_date'] == '':
                 device.fortiguard = 'expired'
             else:
                 device.fortiguard = rjson['antivirus']['expiry_date']
         except:
-            device.fortiguard = 'unavailable'
+            device.fortiguard = 'unknown'
         try:
             device.av_db = str(rjson['antivirus']['version'])
         except:
-            device.av_db = 'unavailable'
+            device.av_db = 'unknown'
     if device.firmware[1:4] == '5.6':
         req = device.session.get('https://' + device.ip + ':' + device.port + '/api/v2/monitor/license/status/')
         try:
@@ -217,7 +202,7 @@ def collect_info(device):
                 device.forticare = rjson['results']['forticare']['support']['hardware']['expires']
                 device.forticare = time.strftime("%d.%m.%Y", time.localtime(device.forticare))
         except:
-            device.forticare = 'unavailable'
+            device.forticare = 'unknown'
         try:
             if rjson['results']['antivirus']['expires'] == '':
                 device.fortiguard = 'expired'
@@ -225,55 +210,58 @@ def collect_info(device):
                 device.fortiguard = rjson['results']['antivirus']['expires']
                 device.fortiguard = time.strftime("%d.%m.%Y", time.localtime(device.fortiguard))
         except:
-            device.fortiguard = 'unavailable'
+            device.fortiguard = 'unknown'
         try:
             device.av_db = str(rjson['results']['antivirus']['version'])
         except:
-            device.av_db = 'unavailable'
+            device.av_db = 'unknown'
 
     # COLLECT Local-in-policy
-    if device.firmware[1:4] == '5.2' or device.firmware[1:4] == '5.4' or device.firmware[1:4] == '5.6':
-        req = device.session.get('https://' + device.ip + ':' + device.port + '/api/v2/cmdb/firewall/local-in-policy')
-        try:
-            rjson = req.json()
-        except:
-            logging.error('executor: unknown response for request')
-        try:
-            if rjson['results'] != []:
-                device.local_in = True
-        except:
-            device.local_in = 'unavailable'
-
-def vdom_check(device):
-    req = device.session.get(
-        'https://' + device.ip + ':' + device.port + '/api/v2/monitor/system/vdom-resource/select?global=1')
+    req = device.session.get('https://' + device.ip + ':' + device.port + '/api/v2/cmdb/firewall/local-in-policy')
     try:
         rjson = req.json()
+        if rjson['results'] != []:
+            device.local_in = 'enable'
+        else:
+            device.local_in = 'disable'
     except:
         logging.error('executor: unknown response for request')
-    # print(rjson)
+        device.local_in = 'unknown'
+
+def vdom_check(device):
+    req = device.session.get('https://' + device.ip + ':' + device.port + '/api/v2/cmdb/system/global')
+    try:
+        rjson = req.json()
+        if rjson['results']['vdom-admin'] == 'enable':
+            logging.info('executor: device has vdom mode enabled')
+            device.reason = 'vdom mode enabled'
+            device.vdom_mode = 'enable'
+        else:
+            logging.debug('executor: vdom mode is disabled')
+            device.vdom_mode = 'disable'
+    except:
+        logging.error('executor: unknown response for request')
+        device.vdom_mode = 'unknown'
 
 
 def fmg_check(device):
     # not supported for 5.2
-    req = device.session.get('https://' + device.ip + ':' + device.port + '/api/v2/monitor/system/fortimanager/status')
-    try:
-        rjson = req.json()
-    except:
-        logging.error('executor: unknown response for request')
     if device.firmware[1:4] == '5.2':
         logging.warning('executor: fortimanager check not supported')
         device.fortimanager = 'unknown'
         return
+    req = device.session.get('https://' + device.ip + ':' + device.port + '/api/v2/monitor/system/fortimanager/status')
     try:
+        rjson = req.json()
         if rjson['results'] != {}:
             logging.info('executor: device is managed by fortimanager')
-            device.fortimanager = True
             device.reason = 'managed by fortimanager'
+            device.fortimanager = 'enable'
         else:
             logging.debug('executor: device is not managed by fortimanager')
-    except KeyError:
-        logging.warning('executor: fortimanager check failed')
+            device.fortimanager = 'disable'
+    except:
+        logging.error('executor: unknown response for request')
 
 
 def perform_backup(device):
@@ -298,18 +286,18 @@ def check_req(request):
     try:
         rjson = request.json()
         if rjson["http_status"] == 200:
-            logging.debug('executor: command successfull executed')
+            logging.debug('executor: command successful executed')
         else:
             logging.warning('executor: command not executed')
     except:
         logging.error('executor: unknown response for request')
 
-def run_summary(total, success, failed_devices, duplicates, skipped_devices = None):
+def run_summary(file, total, success, failed_devices, duplicates, skipped_devices = None,):
     if skipped_devices == None:
-        f = open('C:/BulkChanger/infocollector.log', 'a')
+        f = open(file, 'a')
         f.write('\n*********************************************')
         f.write('\n*\tTotal\tSuccess\t\tFailed\tDuplicates\t*')
-        f.write('\n*\t' + str(total+duplicates) + '\t\t' + str(success) + '\t\t' +
+        f.write('\n*\t' + str(total) + '\t\t' + str(success) + '\t\t' +
                 '\t' + str(len(failed_devices)) + '\t\t'+ str(duplicates) + '\t\t\t*')
         f.write('\n*********************************************\n\nPlease check the following devices manually:')
         i = 0
@@ -319,10 +307,10 @@ def run_summary(total, success, failed_devices, duplicates, skipped_devices = No
             i += 1
         f.close()
     else:
-        f = open('C:/BulkChanger/bulkchanger.log', 'a')
+        f = open(file, 'a')
         f.write('\n\n*********************************************************')
         f.write('\n*\tTotal\tSuccess\t\tFailed\tSkipped\t\tDuplicates\t*')
-        f.write('\n*\t' + str(total+duplicates) + '\t\t' + str(success)
+        f.write('\n*\t' + str(total) + '\t\t' + str(success)
                 + '\t\t' + '\t' + str(len(failed_devices)) + '\t\t' + str(len(skipped_devices)) + '\t\t\t'
                 + str(duplicates) + '\t\t\t*')
         f.write('\n*********************************************************\n\n'
@@ -333,3 +321,11 @@ def run_summary(total, success, failed_devices, duplicates, skipped_devices = No
                 failed_devices[i].port) + '\tBecause: ' + str(failed_devices[i].reason))
             i += 1
         f.close()
+
+
+def config_backup(device):
+    req = device.session.get('https://1.1.1.1:8443/api/v2/monitor/system/config/backup/download')
+    file = Config().backup_folder + '/' + req.headers.get('Content-Disposition').split('"')[1]
+    file = file[:-10] + '.conf'
+    file = file + '.conf'
+    open(file, 'wb').write(req.content)

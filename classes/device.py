@@ -22,19 +22,17 @@ class Device:
         self.firmware = None
         self.serial = None
         self.reason = None
-        self.vdom = []
-        self.fortimanager = False
+        self.fortimanager = None
         # infos for get info command
         self.av_db = None
         self.forticare = None
         self.fortiguard = None
-        self.uptime = None
         self.vdom_mode = None
         self.ssid = []
         self.ap_firmware = []
         self.ap_serial = []
         self.ap_name = []
-        self.local_in = False
+        self.local_in = None
 
     def login(self, user, password):
         self.session = Session()

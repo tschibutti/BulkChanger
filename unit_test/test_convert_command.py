@@ -32,17 +32,6 @@ class TestConvert_command(TestCase):
         self.assertEqual(cmd[1].name, 'dgu')
         self.assertEqual(cmd[1].path, 'system/admin')
 
-    def test_complex_object(self):
-        cmd = cli_converter.convert_command('complex_object.txt', 'C:/BulkChanger/input')
-        self.assertEqual(cmd[0].body,
-                         '{\'json\':{"srcintf":[{"name":"internal"}],"dstintf":[{"name":"wan1"}],'
-                         '"srcaddr":[{"name":"all"}],"dstaddr":[{"name":"all"}],"action":"accept",'
-                         '"schedule":"always","service":[{"name":"ALL"}],"logtraffic":"all","comments":"fge test",'
-                         '"nat":"enable"}}')
-        self.assertEqual(cmd[0].action, 'edit')
-        self.assertEqual(cmd[0].name, '0')
-        self.assertEqual(cmd[0].path, 'firewall/policy')
-
     def test_interface_zone(self):
         cmd = cli_converter.convert_command('interface_zone.txt', 'C:/BulkChanger/input')
         self.assertEqual(cmd[0].body,
@@ -93,31 +82,31 @@ class TestConvert_command(TestCase):
     def test_firewall_policy(self):
         cmd = cli_converter.convert_command('firewall_policy.txt', 'C:/BulkChanger/input')
         self.assertEqual(cmd[0].body,
-                         '{\'json\':{"srcintf":[{"name":"internal"}],"dstintf":[{"name":"internet"}],'
+                         '{"srcintf":[{"name":"internal"}],"dstintf":[{"name":"internet"}],'
                          '"srcaddr":[{"name":"all"}],"dstaddr":[{"name":"all"}],"action":"accept","schedule":"always",'
-                         '"service":[{"name":"ALL"}],"logtraffic":"all","comments":"fge test","nat":"enable"}}')
+                         '"service":[{"name":"ALL"}],"logtraffic":"all","comments":"fge test","nat":"enable"}')
         self.assertEqual(cmd[0].action, 'edit')
         self.assertEqual(cmd[0].name, '0')
         self.assertEqual(cmd[0].path, 'firewall/policy')
 
     def test_local_in_policy(self):
         cmd = cli_converter.convert_command('local_in_policy.txt', 'C:/BulkChanger/input')
-        self.assertEqual(cmd[0].body, '{\'json\':{"intf":"internet","srcaddr":[{"name":"all"}],'
+        self.assertEqual(cmd[0].body, '{"intf":"internet","srcaddr":[{"name":"all"}],'
                                       '"dstaddr":[{"name":"all"}],"action":"accept","service":[{"name":"PING"},'
                                       '{"name":"IKE"},{"name":"ESP"},{"name":"HTTPS"},{"name":"fortisslvpn"}],'
-                                      '"schedule":"always"}}')
+                                      '"schedule":"always"}')
         self.assertEqual(cmd[0].action, 'edit')
         self.assertEqual(cmd[0].name, '0')
         self.assertEqual(cmd[0].path, 'firewall/local-in-policy')
-        self.assertEqual(cmd[1].body, '{\'json\':{"intf":"internet","srcaddr":[{"name":"grp_ffn-support"},'
+        self.assertEqual(cmd[1].body, '{"intf":"internet","srcaddr":[{"name":"grp_ffn-support"},'
                                       '{"name":"grp_forti-support"}],"dstaddr":[{"name":"all"}],"action":"accept",'
                                       '"service":[{"name":"SSH"},{"name":"fortiadmin"},{"name":"ALL_ICMP"}],'
-                                      '"schedule":"always"}}')
+                                      '"schedule":"always"}')
         self.assertEqual(cmd[1].action, 'edit')
         self.assertEqual(cmd[1].name, '0')
         self.assertEqual(cmd[1].path, 'firewall/local-in-policy')
-        self.assertEqual(cmd[2].body, '{\'json\':{"intf":"internet","srcaddr":[{"name":"all"}],'
-                                      '"dstaddr":[{"name":"all"}],"service":[{"name":"ALL"}],"schedule":"always"}}')
+        self.assertEqual(cmd[2].body, '{"intf":"internet","srcaddr":[{"name":"all"}],'
+                                      '"dstaddr":[{"name":"all"}],"service":[{"name":"ALL"}],"schedule":"always"}')
         self.assertEqual(cmd[2].action, 'edit')
         self.assertEqual(cmd[2].name, '0')
         self.assertEqual(cmd[2].path, 'firewall/local-in-policy')

@@ -193,8 +193,6 @@ def convert_command(input_file, input_folder) -> []:
                 cbody = cbody + ',{'
                 inner_edit = False
             else:
-                if 'firewall/policy' in cpath or 'firewall/local-in-policy' in cpath:
-                    cbody = '{\'json\':' + cbody + '}'
                 cmd.append(Command(cpath, cbody, capi, caction, cname))
                 if 'null' in cbody:
                     # "unset" command needs to be executed twice
@@ -244,20 +242,8 @@ def print_command(cmd):
         print('commands: ' + cmd[j].body)
         j = j + 1
 
-def v52_marshalling(cmd):
+def marshalling(cmd):
     logging.debug('command: marshalling for 5.2 befor execution')
-    j = 0
-    while j < len(cmd):
-        if cmd[j].body != '':
-            cmd[j].body = '{\'json\':' + cmd[j].body + '}'
-        j = j + 1
-
-
-def v52_unmarshalling(cmd):
-    logging.debug('command: unmarshalling for 5.2 after execution')
-    j = 0
-    while j < len(cmd):
-        if cmd[j].body != '':
-            cmd[j].body = cmd[j].body[:-1]
-            cmd[j].body = cmd[j].body[8:]
-        j = j + 1
+    for c in cmd:
+        if c.body != '':
+            c.body = '{\'json\':' + c.body + '}'
