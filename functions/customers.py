@@ -21,7 +21,7 @@ def collect_firewalls() -> []:
     if not os.path.exists(Config().devices_folder):
         logging.error('devices: folder not found')
         return
-    
+
     os.chdir(Config().devices_folder)
     for fileName in os.listdir('.'):
         if '#nobulk' in fileName:

@@ -1,27 +1,138 @@
-2018-01-04 17:53:04 INFO config: load config from file
-2018-01-04 17:53:04 INFO devices: using folder as source
-2018-01-04 17:53:04 INFO devices: collected all firewalls from folder -> found 4 firewalls
-2018-01-04 17:53:04 INFO sslvpn: collected all profiles -> found 2 profiles
-2018-01-04 17:53:04 INFO ******************************************************************
-2018-01-04 17:53:04 INFO IP: 84.253.41.242	 Port:8443	 Customer: 3-Plan Kreuzlingen
-2018-01-04 17:53:06 WARNING login: timed out, skip device
-2018-01-04 17:53:06 INFO ******************************************************************
-2018-01-04 17:53:06 INFO IP: 213.160.33.146	 Port:8443	 Customer: 3-Plan Winterthur
-2018-01-04 17:53:08 WARNING login: timed out, skip device
-2018-01-04 17:53:08 INFO ******************************************************************
-2018-01-04 17:53:08 INFO IP: 46.14.52.210	 Port:8443	 Customer: 3-Plan Winterthur
-2018-01-04 17:53:10 WARNING login: timed out, skip device
-2018-01-04 17:53:10 INFO ******************************************************************
-2018-01-04 17:53:10 INFO IP: 82.136.65.146	 Port:8443	 Customer: ABS Personal
-2018-01-04 17:53:13 WARNING login: timed out, skip device
+2018-01-04 18:05:08 INFO devices: using folder as source
+2018-01-04 18:05:08 INFO devices: collected all firewalls from folder -> found 32 firewalls
+2018-01-04 18:05:08 INFO sslvpn: collected all profiles -> found 2 profiles
+2018-01-04 18:05:08 INFO ******************************************************************
+2018-01-04 18:05:08 INFO IP: 192.168.8.2	 Port:8443	 Customer: 3-Plan Kreuzlingen
+2018-01-04 18:05:08 WARNING login: wrong username or password
+2018-01-04 18:05:08 INFO ******************************************************************
+2018-01-04 18:05:08 INFO IP: 192.168.8.2	 Port:8443	 Customer: 3-Plan Kreuzlingen
+2018-01-04 18:05:09 WARNING login: wrong username or password
+2018-01-04 18:05:09 INFO ******************************************************************
+2018-01-04 18:05:09 INFO IP: 192.168.8.2	 Port:8443	 Customer: 3-Plan Kreuzlingen
+2018-01-04 18:05:09 WARNING login: wrong username or password
+2018-01-04 18:05:09 INFO ******************************************************************
+2018-01-04 18:05:09 INFO IP: 192.168.8.2	 Port:8443	 Customer: 3-Plan Kreuzlingen
+2018-01-04 18:05:09 WARNING login: wrong username or password
+2018-01-04 18:05:09 INFO ******************************************************************
+2018-01-04 18:05:09 INFO IP: 192.168.8.2	 Port:8443	 Customer: 3-Plan Kreuzlingen
+2018-01-04 18:05:10 WARNING login: wrong username or password
+2018-01-04 18:05:10 INFO ******************************************************************
+2018-01-04 18:05:10 INFO IP: 192.168.8.2	 Port:8443	 Customer: 3-Plan Kreuzlingen
+2018-01-04 18:05:10 WARNING login: wrong username or password
+2018-01-04 18:05:10 INFO ******************************************************************
+2018-01-04 18:05:10 INFO IP: 192.168.8.2	 Port:8443	 Customer: 3-Plan Kreuzlingen
+2018-01-04 18:05:10 WARNING login: wrong username or password
+2018-01-04 18:05:10 INFO ******************************************************************
+2018-01-04 18:05:10 INFO IP: 192.168.8.2	 Port:8443	 Customer: 3-Plan Kreuzlingen
+2018-01-04 18:05:11 WARNING login: wrong username or password
+2018-01-04 18:05:11 INFO ******************************************************************
+2018-01-04 18:05:11 INFO IP: 192.168.8.2	 Port:8443	 Customer: 3-Plan Kreuzlingen
+2018-01-04 18:05:11 WARNING login: wrong username or password
+2018-01-04 18:05:11 INFO ******************************************************************
+2018-01-04 18:05:11 INFO IP: 192.168.8.2	 Port:8443	 Customer: 3-Plan Kreuzlingen
+2018-01-04 18:05:11 WARNING login: wrong username or password
+2018-01-04 18:05:11 INFO ******************************************************************
+2018-01-04 18:05:11 INFO IP: 192.168.8.2	 Port:8443	 Customer: 3-Plan Kreuzlingen
+2018-01-04 18:05:12 WARNING login: wrong username or password
+2018-01-04 18:05:12 INFO ******************************************************************
+2018-01-04 18:05:12 INFO IP: 192.168.8.2	 Port:8443	 Customer: 3-Plan Kreuzlingen
+2018-01-04 18:05:12 WARNING login: wrong username or password
+2018-01-04 18:05:12 INFO ******************************************************************
+2018-01-04 18:05:12 INFO IP: 192.168.8.2	 Port:8443	 Customer: 3-Plan Kreuzlingen
+2018-01-04 18:05:12 WARNING login: wrong username or password
+2018-01-04 18:05:12 INFO ******************************************************************
+2018-01-04 18:05:12 INFO IP: 192.168.8.2	 Port:8443	 Customer: 3-Plan Kreuzlingen
+2018-01-04 18:05:13 WARNING login: wrong username or password
+2018-01-04 18:05:13 INFO ******************************************************************
+2018-01-04 18:05:13 INFO IP: 192.168.8.2	 Port:8443	 Customer: 3-Plan Kreuzlingen
+2018-01-04 18:05:13 WARNING login: wrong username or password
+2018-01-04 18:05:13 INFO ******************************************************************
+2018-01-04 18:05:13 INFO IP: 192.168.8.2	 Port:8443	 Customer: 3-Plan Kreuzlingen
+2018-01-04 18:05:14 WARNING login: wrong username or password
+2018-01-04 18:05:14 INFO ******************************************************************
+2018-01-04 18:05:14 INFO IP: 192.168.8.2	 Port:8443	 Customer: 3-Plan Kreuzlingen
+2018-01-04 18:05:14 WARNING login: wrong username or password
+2018-01-04 18:05:14 INFO ******************************************************************
+2018-01-04 18:05:14 INFO IP: 192.168.8.2	 Port:8443	 Customer: 3-Plan Kreuzlingen
+2018-01-04 18:05:15 WARNING login: wrong username or password
+2018-01-04 18:05:15 INFO ******************************************************************
+2018-01-04 18:05:15 INFO IP: 192.168.8.2	 Port:8443	 Customer: 3-Plan Kreuzlingen
+2018-01-04 18:05:15 WARNING login: wrong username or password
+2018-01-04 18:05:15 INFO ******************************************************************
+2018-01-04 18:05:15 INFO IP: 192.168.8.2	 Port:8443	 Customer: 3-Plan Kreuzlingen
+2018-01-04 18:05:15 WARNING login: wrong username or password
+2018-01-04 18:05:15 INFO ******************************************************************
+2018-01-04 18:05:15 INFO IP: 192.168.8.2	 Port:8443	 Customer: 3-Plan Kreuzlingen
+2018-01-04 18:05:16 WARNING login: wrong username or password
+2018-01-04 18:05:16 INFO ******************************************************************
+2018-01-04 18:05:16 INFO IP: 192.168.8.2	 Port:8443	 Customer: 3-Plan Kreuzlingen
+2018-01-04 18:05:16 WARNING login: wrong username or password
+2018-01-04 18:05:16 INFO ******************************************************************
+2018-01-04 18:05:16 INFO IP: 192.168.8.2	 Port:8443	 Customer: 3-Plan Kreuzlingen
+2018-01-04 18:05:16 WARNING login: wrong username or password
+2018-01-04 18:05:16 INFO ******************************************************************
+2018-01-04 18:05:16 INFO IP: 192.168.8.2	 Port:8443	 Customer: 3-Plan Kreuzlingen
+2018-01-04 18:05:17 WARNING login: wrong username or password
+2018-01-04 18:05:17 INFO ******************************************************************
+2018-01-04 18:05:17 INFO IP: 192.168.8.2	 Port:8443	 Customer: 3-Plan Kreuzlingen
+2018-01-04 18:05:17 WARNING login: wrong username or password
+2018-01-04 18:05:17 INFO ******************************************************************
+2018-01-04 18:05:17 INFO IP: 192.168.8.2	 Port:8443	 Customer: 3-Plan Kreuzlingen
+2018-01-04 18:05:17 WARNING login: wrong username or password
+2018-01-04 18:05:17 INFO ******************************************************************
+2018-01-04 18:05:17 INFO IP: 192.168.8.2	 Port:8443	 Customer: 3-Plan Kreuzlingen
+2018-01-04 18:05:17 WARNING login: wrong username or password
+2018-01-04 18:05:17 INFO ******************************************************************
+2018-01-04 18:05:17 INFO IP: 192.168.8.2	 Port:8443	 Customer: 3-Plan Kreuzlingen
+2018-01-04 18:05:18 WARNING login: wrong username or password
+2018-01-04 18:05:18 INFO ******************************************************************
+2018-01-04 18:05:18 INFO IP: 192.168.8.2	 Port:8443	 Customer: 3-Plan Kreuzlingen
+2018-01-04 18:05:18 WARNING login: wrong username or password
+2018-01-04 18:05:18 INFO ******************************************************************
+2018-01-04 18:05:18 INFO IP: 192.168.8.2	 Port:8443	 Customer: 3-Plan Kreuzlingen
+2018-01-04 18:05:19 WARNING login: wrong username or password
+2018-01-04 18:05:19 INFO ******************************************************************
+2018-01-04 18:05:19 INFO IP: 192.168.8.2	 Port:8443	 Customer: 3-Plan Kreuzlingen
+2018-01-04 18:05:19 WARNING login: wrong username or password
+2018-01-04 18:05:19 INFO ******************************************************************
+2018-01-04 18:05:19 INFO IP: 192.168.8.2	 Port:8443	 Customer: 3-Plan Kreuzlingen
+2018-01-04 18:05:20 WARNING login: wrong username or password
 
 *********************************************
 *	Total	Success		Failed	Duplicates	*
-*	4		0			4		0			*
+*	32		0			32		0			*
 *********************************************
 
 Please check the following devices manually:
-3-Plan Kreuzlingen,84.253.41.242,8443	Because: wrong username or password
-3-Plan Winterthur,213.160.33.146,8443	Because: wrong username or password
-3-Plan Winterthur,46.14.52.210,8443	Because: wrong username or password
-ABS Personal,82.136.65.146,8443	Because: wrong username or password
+3-Plan Kreuzlingen,192.168.8.2,8443	Because: wrong username or password
+3-Plan Kreuzlingen,192.168.8.2,8443	Because: wrong username or password
+3-Plan Kreuzlingen,192.168.8.2,8443	Because: wrong username or password
+3-Plan Kreuzlingen,192.168.8.2,8443	Because: wrong username or password
+3-Plan Kreuzlingen,192.168.8.2,8443	Because: wrong username or password
+3-Plan Kreuzlingen,192.168.8.2,8443	Because: wrong username or password
+3-Plan Kreuzlingen,192.168.8.2,8443	Because: wrong username or password
+3-Plan Kreuzlingen,192.168.8.2,8443	Because: wrong username or password
+3-Plan Kreuzlingen,192.168.8.2,8443	Because: wrong username or password
+3-Plan Kreuzlingen,192.168.8.2,8443	Because: wrong username or password
+3-Plan Kreuzlingen,192.168.8.2,8443	Because: wrong username or password
+3-Plan Kreuzlingen,192.168.8.2,8443	Because: wrong username or password
+3-Plan Kreuzlingen,192.168.8.2,8443	Because: wrong username or password
+3-Plan Kreuzlingen,192.168.8.2,8443	Because: wrong username or password
+3-Plan Kreuzlingen,192.168.8.2,8443	Because: wrong username or password
+3-Plan Kreuzlingen,192.168.8.2,8443	Because: wrong username or password
+3-Plan Kreuzlingen,192.168.8.2,8443	Because: wrong username or password
+3-Plan Kreuzlingen,192.168.8.2,8443	Because: wrong username or password
+3-Plan Kreuzlingen,192.168.8.2,8443	Because: wrong username or password
+3-Plan Kreuzlingen,192.168.8.2,8443	Because: wrong username or password
+3-Plan Kreuzlingen,192.168.8.2,8443	Because: wrong username or password
+3-Plan Kreuzlingen,192.168.8.2,8443	Because: wrong username or password
+3-Plan Kreuzlingen,192.168.8.2,8443	Because: wrong username or password
+3-Plan Kreuzlingen,192.168.8.2,8443	Because: wrong username or password
+3-Plan Kreuzlingen,192.168.8.2,8443	Because: wrong username or password
+3-Plan Kreuzlingen,192.168.8.2,8443	Because: wrong username or password
+3-Plan Kreuzlingen,192.168.8.2,8443	Because: wrong username or password
+3-Plan Kreuzlingen,192.168.8.2,8443	Because: wrong username or password
+3-Plan Kreuzlingen,192.168.8.2,8443	Because: wrong username or password
+3-Plan Kreuzlingen,192.168.8.2,8443	Because: wrong username or password
+3-Plan Kreuzlingen,192.168.8.2,8443	Because: wrong username or password
+3-Plan Kreuzlingen,192.168.8.2,8443	Because: wrong username or password
