@@ -39,17 +39,21 @@ class BulkChanger(QThread):
 
     def start_bulk(self):
         # VARIABLES
-        devices = []
+        # devices = []
         failed_devices = []
         skipped_devices = []
         success_devices = []
         duplicates = 0
-        cmd = []
-        sslvpn_user = None
-        sslvpn_password = None
+        # cmd = []
+        # sslvpn_user = None
+        # sslvpn_password = None
         sslconnected = False
 
         # LOG FILE
+        # REMOVE LOGGING HANDLERS
+        for handler in logging.root.handlers[:]:
+            logging.root.removeHandler(handler)
+
         if getattr(sys, 'frozen', False):
             log_path = os.path.join(os.path.abspath(os.path.dirname(sys.executable)), 'bulkchanger.log')
         else:

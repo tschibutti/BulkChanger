@@ -1,42 +1,5 @@
 config system admin
-    edit "dpo"
-        set accprofile "super_admin"
-        set vdom "root"
-        set password ENC AK16D3CKqjt+2aM/xf2ieZJcDoFdx2MhS5TxQWngTJi61s=
-    next
-    edit "dgu"
-        set accprofile "super_admin"
-        set vdom "root"
-        set password ENC AK1P+a8jSjvASnxe4qTPCFGtCkpZYhdUJDWC1IzLHQVRe0=
-    next
-    edit "fbo"
-        set accprofile "super_admin"
-        set vdom "root"
-        set password ENC AK1PcCPgDRzoXZDfPspRp0+ouBniU5HATFZ+c/4oLHbCOI=
-    next
-    edit "jan"
-        set accprofile "super_admin"
-        set vdom "root"
-        set password ENC AK13JhECHOSgYBLnHThRDpR+Yq/GsAQQeCqLlpfD/oIx+w=
-    next
-    edit "rst"
-        set accprofile "super_admin"
-        set vdom "root"
-        set password ENC AK1VogLMZZlj3ooB39WMG8dC+PZx1EQxZAkeojbgLHk8CY=
-    next
-    edit "yha"
-        set accprofile "super_admin"
-        set vdom "root"
-        set password ENC AK1fUNg98aU3YRmXkS4UTjjVfD2Jcjq5Z3tGZrPi0Im2p0=
-    next
-    edit "rbo"
-           set accprofile "super_admin"
-           set vdom "root"
-           set password ENC SH2F/av2Id9rkI2XC+4zjfYCAuLjaV8aTHBchIVAYtJ8inBUUNBsOBGa68TjTA=
-    next
-    edit "fge"
-           set accprofile "super_admin"
-           set vdom "root"
-           set password ENC SH23+4qpYlKoUBGf5I39qvuwVS7HZFtw11las/zpIdE/svYN8jFMPOGvKJDdW0=
-    next
+	delete rbo
+	delete dgu
+	delete fbo
 end

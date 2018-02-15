@@ -264,17 +264,23 @@ def fmg_check(device):
         logging.error('executor: unknown response for request')
 
 
-def perform_backup(device):
-    req = device.session.get(
-        'https://' + device.ip + ':' + device.port + '/api/v2/monitor/system/config/backup/download?scope=global')
-    file = Config().backup_folder + '/' + req.headers.get('Content-Disposition').split('"')[1]
-    file = file[:-10]
-    file = file + '.conf'
-    if req.headers.get('Content-Disposition'):
-        open(file, 'wb').write(req.content)
-        logging.debug('executor: config backup successful performed')
+def perform_backup(device, trial = None):
+    if trial == None:
+        req = device.session.get(
+            'https://' + device.ip + ':' + device.port + '/api/v2/monitor/system/config/backup/download?scope=global')
+        file = Config().backup_folder + '/' + req.headers.get('Content-Disposition').split('"')[1]
+        file = file[:-10]
+        file = file + '.conf'
+        if req.headers.get('Content-Disposition'):
+            open(file, 'wb').write(req.content)
+            logging.debug('executor: config backup successful performed')
+        else:
+            logging.warning('executor: config backpu was not successful')
     else:
-        logging.warning('executor: config backpu was not successful')
+        req = device.session.get(
+            'https://' + device.ip + ':' + device.port + '/api/v2/monitor/system/config/backup/download?scope=global')
+        file = Config().backup_folder + '/' + trial + '.conf'
+        open(file, 'wb').write(req.content)
 
 
 def check_existence(device, cmd):

@@ -4,7 +4,6 @@ import csv
 import logging
 import time
 import subprocess
-from utils.config import Config
 
 
 def save_info(devices):

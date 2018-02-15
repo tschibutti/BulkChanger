@@ -1,6 +1,5 @@
 import os
 import urllib3
-import re
 import socket
 from requests import RequestException
 from requests import Session

@@ -1,19 +1,13 @@
-2018-01-02 16:04:15 INFO config: load config from file
-2018-01-02 16:04:15 INFO devices: using config file as source
-2018-01-02 16:04:15 INFO devices: found 1 firewalls
-2018-01-02 16:04:15 INFO sslvpn: collected all profiles -> found 2 profiles
-2018-01-02 16:04:15 INFO command: converted cli command to rest api command
-2018-01-02 16:04:15 INFO command: parsed 8 commands
-2018-01-02 16:04:15 INFO ******************************************************************
-2018-01-02 16:04:15 INFO IP: 192.168.8.2	 Port:8443	 Customer: Config File
-2018-01-02 16:04:16 INFO executor: object exist, updating settings
-2018-01-02 16:04:17 INFO executor: object exist, updating settings
-2018-01-02 16:04:17 INFO executor: object exist, updating settings
-2018-01-02 16:04:17 INFO executor: object exist, updating settings
-2018-01-02 16:04:17 INFO executor: object exist, updating settings
-2018-01-02 16:04:17 INFO executor: object exist, updating settings
-2018-01-02 16:04:17 INFO executor: object exist, updating settings
-2018-01-02 16:04:17 INFO executor: object exist, updating settings
+2018-02-15 22:04:18 INFO devices: using config file as source
+2018-02-15 22:04:18 INFO devices: found 1 firewalls
+2018-02-15 22:04:18 INFO sslvpn: collected all profiles -> found 2 profiles
+2018-02-15 22:04:18 INFO command: converted cli command to rest api command
+2018-02-15 22:04:18 INFO command: parsed 3 commands
+2018-02-15 22:04:18 INFO ******************************************************************
+2018-02-15 22:04:18 INFO IP: 192.168.8.2	 Port:8443	 Customer: Config File
+2018-02-15 22:04:18 WARNING executor: object not exist, nothing to delete
+2018-02-15 22:04:18 WARNING executor: object not exist, nothing to delete
+2018-02-15 22:04:18 WARNING executor: object not exist, nothing to delete
 
 
 *********************************************************

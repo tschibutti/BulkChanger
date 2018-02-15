@@ -2,9 +2,10 @@ import subprocess
 import os
 import sys
 from bulk_changer import BulkChanger
-from PyQt5.QtWidgets import QWidget, QPushButton, QLabel, QGridLayout, QTextEdit, QMessageBox, QLineEdit, QInputDialog
+from bulk_verify import BulkVerify
+from PyQt5.QtWidgets import QWidget, QPushButton, QLabel, QGridLayout, QTextEdit, QDialog, QLineEdit, QInputDialog, QCheckBox, QMessageBox
 from PyQt5.QtGui import QColor, QIcon
-from PyQt5.QtCore import QSize
+from PyQt5.QtCore import QSize, QEvent, Qt
 
 class Bulk(QWidget):
 
@@ -13,7 +14,6 @@ class Bulk(QWidget):
         self.initUI()
 
     def initUI(self):
-
         self.setFixedSize(800, 500)
         self.setWindowTitle('BulkChanger by Florian Gemperle')
         if getattr(sys, 'frozen', False):
@@ -47,6 +47,19 @@ class Bulk(QWidget):
         if not os.path.isfile(self.input_file_path):
             temp_file = open(self.input_file_path, 'w+')
             temp_file.close()
+
+        # Variables
+        self.firewall_user = ''
+        self.firewall_password = ''
+        self.sslvpn_user = ''
+        self.sslvpn_password = ''
+        self.ipaddress = '192.168.8.2'
+        self.port = '8443'
+
+        # Dialog
+        self.start_dialog = QDialog()
+        self.start_dialog.setWindowIcon(app_icon)
+        self.load_start_dialog()
 
         # Buttons
         self.btn_start = QPushButton('Start Run', self)
@@ -133,28 +146,29 @@ class Bulk(QWidget):
 
 
     def start_run(self):
-        text, result = QInputDialog.getText(self, 'Credentials', 'FortiGate User', QLineEdit.Normal)
-        if result:
-            self.firewall_user = str(text)
-            text, result = QInputDialog.getText(self, 'Credentials', 'FortiGate Password', QLineEdit.Password)
-            if result:
-                self.firewall_password = str(text)
-                text, result = QInputDialog.getText(self, 'Credentials', 'SSL VPN User', QLineEdit.Normal,
-                                                    self.firewall_user)
-                if result:
-                    self.sslvpn_user = str(text)
-                    text, result = QInputDialog.getText(self, 'Credentials', 'SSL VPN Password', QLineEdit.Password,
-                                                        self.firewall_password)
-                    if result:
-                        self.sslvpn_password = str(text)
-                        self.btn_start.setEnabled(False)
-                        self.btn_abort.setEnabled(True)
-                        self.output_append('black', 'START RUN')
-                        self.changer = BulkChanger(self.output_append, self.update_status, self.end_run,
-                                                   self.exception_occured, self.firewall_user,
-                                                   self.firewall_password, self.sslvpn_user,
-                                                   self.sslvpn_password)
-                        self.changer.start()
+        self.start_dialog.setVisible(True)
+        # text, result = QInputDialog.getText(self, 'Credentials', 'FortiGate User', QLineEdit.Normal)
+        # if result:
+        #     self.firewall_user = str(text)
+        #     text, result = QInputDialog.getText(self, 'Credentials', 'FortiGate Password', QLineEdit.Password)
+        #     if result:
+        #         self.firewall_password = str(text)
+        #         text, result = QInputDialog.getText(self, 'Credentials', 'SSL VPN User', QLineEdit.Normal,
+        #                                             self.firewall_user)
+        #         if result:
+        #             self.sslvpn_user = str(text)
+        #             text, result = QInputDialog.getText(self, 'Credentials', 'SSL VPN Password', QLineEdit.Password,
+        #                                                 self.firewall_password)
+        #             if result:
+        #                 self.sslvpn_password = str(text)
+        #                 self.btn_start.setEnabled(False)
+        #                 self.btn_abort.setEnabled(True)
+        #                 self.output_append('black', 'START RUN')
+        #                 self.changer = BulkChanger(self.output_append, self.update_status, self.end_run,
+        #                                            self.exception_occured, self.firewall_user,
+        #                                            self.firewall_password, self.sslvpn_user,
+        #                                            self.sslvpn_password)
+        #                 self.changer.start()
 
     def end_run(self):
         self.btn_start.setEnabled(True)
@@ -199,5 +213,132 @@ class Bulk(QWidget):
             self.output_area.setTextColor(QColor(0, 0, 0))
         self.output_area.append(text)
 
+    def load_start_dialog(self):
+        self.start_dialog.setFixedSize(700, 250)
+        self.start_dialog.setWindowTitle('Credentials')
+
+        # Buttons
+        btn_dialog_cancle = QPushButton('Cancle', self)
+        btn_dialog_cancle.clicked.connect(self.close_dialog)
+        btn_dialog_cancle.resize(btn_dialog_cancle.sizeHint())
+
+        self.btn_dialog_ok = QPushButton('OK', self)
+        self.btn_dialog_ok.clicked.connect(self.ok_dialog)
+        self.btn_dialog_ok.resize(self.btn_dialog_ok.sizeHint())
+
+
+        # Labels
+        txt_fgt = QLabel('FortiGate', self)
+        txt_fgt.setStyleSheet('font-size: 12px; font: bold')
+        txt_ssl = QLabel('SSL-VPN', self)
+        txt_ssl.setStyleSheet('font-size: 12px; font: bold')
+        txt_user1 = QLabel('Username:', self)
+        txt_password1 = QLabel('Password:', self)
+        txt_user2 = QLabel('Username:', self)
+        txt_password2 = QLabel('Password:', self)
+        txt_question = QLabel('Do you want to do a test run?', self)
+        txt_question.setStyleSheet('font: bold; margin-bottom: 20px; margin-top: 20px')
+        txt_ip = QLabel('IP-Address:', self)
+        txt_port = QLabel('Port:', self)
+
+        # Checkbox
+        self.chk_question = QCheckBox(self)
+        self.chk_question.stateChanged.connect(self.invers_dialog_lines)
+        # self.chk_question.setChecked(True)
+        # self.chk_question.setCheckState(True)
+
+        # Inputs
+        self.in_fgt_user = QLineEdit()
+        self.in_fgt_user.setText(self.firewall_user)
+        self.in_fgt_pwd = QLineEdit()
+        self.in_fgt_pwd.setEchoMode(QLineEdit.Password)
+        self.in_fgt_pwd.setText(self.firewall_password)
+        self.in_ssl_user = QLineEdit()
+        self.in_ssl_user.setText(self.sslvpn_user)
+        self.in_ssl_pwd = QLineEdit()
+        self.in_ssl_pwd.setEchoMode(QLineEdit.Password)
+        self.in_ssl_pwd.setText(self.sslvpn_password)
+        self.in_ip = QLineEdit()
+        self.in_ip.setText(self.ipaddress)
+        self.in_port = QLineEdit()
+        self.in_port.setText(self.port)
+
+        # Layout
+        grid = QGridLayout(self)
+        grid_credentials = QGridLayout()
+        grid_question = QGridLayout()
+        grid_firewall = QGridLayout()
+        grid_buttons = QGridLayout()
+
+        grid.addLayout(grid_credentials, 0, 0)
+        grid.addLayout(grid_question, 1, 0)
+        grid.addLayout(grid_firewall, 2, 0)
+        grid.addLayout(grid_buttons, 3, 0)
+
+        grid_credentials.addWidget(txt_fgt, 0, 0)
+        grid_credentials.addWidget(txt_ssl, 0, 2)
+        grid_credentials.addWidget(txt_user1, 1, 0)
+        grid_credentials.addWidget(self.in_fgt_user, 1, 1)
+        grid_credentials.addWidget(txt_user2, 1, 2)
+        grid_credentials.addWidget(self.in_ssl_user, 1, 3)
+        grid_credentials.addWidget(txt_password1, 2, 0)
+        grid_credentials.addWidget(self.in_fgt_pwd, 2, 1)
+        grid_credentials.addWidget(txt_password2, 2, 2)
+        grid_credentials.addWidget(self.in_ssl_pwd, 2, 3)
+
+        grid_credentials.addWidget(txt_question, 3, 1)
+        grid_credentials.addWidget(self.chk_question, 3, 2)
+
+        grid_credentials.addWidget(txt_ip, 4, 0)
+        grid_credentials.addWidget(self.in_ip, 4, 1)
+        grid_credentials.addWidget(txt_port, 4, 2)
+        grid_credentials.addWidget(self.in_port, 4, 3)
+
+        grid_buttons.addWidget(self.btn_dialog_ok, 0, 0)
+        grid_buttons.addWidget(btn_dialog_cancle, 0, 1)
+
+        self.start_dialog.setLayout(grid)
+
+    def ok_dialog(self):
+        self.start_dialog.setVisible(False)
+        self.btn_start.setEnabled(False)
+        self.btn_abort.setEnabled(True)
+        self.output_append('black', 'START RUN')
+        self.verifier = BulkVerify(self.output_append, self.exception_occured, self.in_fgt_user.text(),
+                                   self.in_fgt_pwd.text(), self.in_ssl_user.text(), self.in_ssl_pwd.text(),
+                                   self.in_ip.text(), self.in_port.text())
+        self.verifier.start()
+        reply = QMessageBox.question(self, 'Verification', 'Are you happy with the changes?',
+                                     QMessageBox.Yes, QMessageBox.No)
+        if reply == QMessageBox.Yes:
+            self.changer = BulkChanger(self.output_append, self.update_status, self.end_run, self.exception_occured,
+                                       self.in_fgt_user.text(), self.in_fgt_pwd.text(), self.in_ssl_user.text(),
+                                       self.in_ssl_pwd.text())
+            self.changer.start()
+        else:
+            self.btn_start.setEnabled(True)
+            self.btn_abort.setEnabled(False)
+            self.output_append('black', 'VERIFICATION FAILED')
+            self.output_append('black', '---------------------------------------------------------------------------')
+
+
+    def close_dialog(self):
+        self.start_dialog.close()
+
+    def update_dialog(self):
+        if self.in_ssl_user.text() == '' and self.in_fgt_user.text() != '':
+            self.in_ssl_user.setText(self.in_fgt_user)
+        if self.in_ssl_pwd.text() == '' and self.in_fgt_pwd.text() != '':
+            self.in_ssl_pwd.setText(self.in_fgt_pwd)
+
+    def invers_dialog_lines(self):
+        if self.in_ip.isEnabled():
+            print('enabled = true')
+            self.in_ip.setEnabled(False)
+            self.in_port.setEnabled(False)
+        else:
+            print('enabled = false')
+            self.in_ip.setEnabled(True)
+            self.in_port.setEnabled(True)
 
 
