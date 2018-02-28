@@ -14,7 +14,7 @@ class Device:
         self.ip = ip
         self.port = port
         self.session = None
-        self.timeout = 2
+        self.timeout = 5
         self.connected = False
         self.customer = customer
         self.online = 0

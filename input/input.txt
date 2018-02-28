@@ -1,5 +1,3 @@
 config system admin
-	delete rbo
-	delete dgu
-	delete fbo
+	delete jan
 end

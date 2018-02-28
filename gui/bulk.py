@@ -3,19 +3,20 @@ import os
 import sys
 from bulk_changer import BulkChanger
 from bulk_verify import BulkVerify
-from PyQt5.QtWidgets import QWidget, QPushButton, QLabel, QGridLayout, QTextEdit, QDialog, QLineEdit, QInputDialog, QCheckBox, QMessageBox
+from PyQt5.QtWidgets import QWidget, QPushButton, QLabel, QGridLayout, QTextEdit, QDialog, QLineEdit, QInputDialog, QCheckBox, QMessageBox, qApp
 from PyQt5.QtGui import QColor, QIcon
 from PyQt5.QtCore import QSize, QEvent, Qt
 
 class Bulk(QWidget):
 
-    def __init__(self):
-        super(Bulk, self).__init__()
+    def __init__(self, parent=None):
+        super(Bulk, self).__init__(parent)
+        qApp.installEventFilter(self)
         self.initUI()
 
     def initUI(self):
         self.setFixedSize(800, 500)
-        self.setWindowTitle('BulkChanger by Florian Gemperle')
+        self.setWindowTitle('BulkChanger')
         if getattr(sys, 'frozen', False):
             app_icon_path = os.path.join(os.path.abspath(os.path.dirname(sys.executable)), 'icon.png')
         else:
@@ -243,9 +244,8 @@ class Bulk(QWidget):
 
         # Checkbox
         self.chk_question = QCheckBox(self)
+        self.chk_question.setCheckState(Qt.Checked)
         self.chk_question.stateChanged.connect(self.invers_dialog_lines)
-        # self.chk_question.setChecked(True)
-        # self.chk_question.setCheckState(True)
 
         # Inputs
         self.in_fgt_user = QLineEdit()
@@ -304,22 +304,28 @@ class Bulk(QWidget):
         self.btn_start.setEnabled(False)
         self.btn_abort.setEnabled(True)
         self.output_append('black', 'START RUN')
-        self.verifier = BulkVerify(self.output_append, self.exception_occured, self.in_fgt_user.text(),
-                                   self.in_fgt_pwd.text(), self.in_ssl_user.text(), self.in_ssl_pwd.text(),
-                                   self.in_ip.text(), self.in_port.text())
-        self.verifier.start()
-        reply = QMessageBox.question(self, 'Verification', 'Are you happy with the changes?',
-                                     QMessageBox.Yes, QMessageBox.No)
-        if reply == QMessageBox.Yes:
+        if self.chk_question.isChecked():
+            self.verifier = BulkVerify(self.output_append, self.exception_occured, self.in_fgt_user.text(),
+                                       self.in_fgt_pwd.text(), self.in_ssl_user.text(), self.in_ssl_pwd.text(),
+                                       self.in_ip.text(), self.in_port.text())
+            self.verifier.start()
+            reply = QMessageBox.question(self, 'Verification', 'Are you happy with the changes?',
+                                         QMessageBox.Yes, QMessageBox.No)
+            if reply == QMessageBox.Yes:
+                self.changer = BulkChanger(self.output_append, self.update_status, self.end_run, self.exception_occured,
+                                           self.in_fgt_user.text(), self.in_fgt_pwd.text(), self.in_ssl_user.text(),
+                                           self.in_ssl_pwd.text())
+                self.changer.start()
+            else:
+                self.btn_start.setEnabled(True)
+                self.btn_abort.setEnabled(False)
+                self.output_append('black', 'VERIFICATION FAILED')
+                self.output_append('black', '---------------------------------------------------------------------------')
+        else:
             self.changer = BulkChanger(self.output_append, self.update_status, self.end_run, self.exception_occured,
                                        self.in_fgt_user.text(), self.in_fgt_pwd.text(), self.in_ssl_user.text(),
                                        self.in_ssl_pwd.text())
             self.changer.start()
-        else:
-            self.btn_start.setEnabled(True)
-            self.btn_abort.setEnabled(False)
-            self.output_append('black', 'VERIFICATION FAILED')
-            self.output_append('black', '---------------------------------------------------------------------------')
 
 
     def close_dialog(self):
@@ -327,18 +333,21 @@ class Bulk(QWidget):
 
     def update_dialog(self):
         if self.in_ssl_user.text() == '' and self.in_fgt_user.text() != '':
-            self.in_ssl_user.setText(self.in_fgt_user)
+            self.in_ssl_user.setText(self.in_fgt_user.text())
         if self.in_ssl_pwd.text() == '' and self.in_fgt_pwd.text() != '':
-            self.in_ssl_pwd.setText(self.in_fgt_pwd)
+            self.in_ssl_pwd.setText(self.in_fgt_pwd.text())
 
     def invers_dialog_lines(self):
         if self.in_ip.isEnabled():
-            print('enabled = true')
             self.in_ip.setEnabled(False)
             self.in_port.setEnabled(False)
         else:
-            print('enabled = false')
             self.in_ip.setEnabled(True)
             self.in_port.setEnabled(True)
 
+    def eventFilter(self, obj, event):
+        if event.type() == QEvent.KeyPress:
+            if event.key() == Qt.Key_Tab:
+                self.update_dialog()
+        return super(Bulk, self).eventFilter(obj, event)
 

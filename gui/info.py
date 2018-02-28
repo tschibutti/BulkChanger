@@ -5,7 +5,6 @@ from info_collector import InfoCollector
 from PyQt5.QtWidgets import QWidget, QPushButton, QLabel, QGridLayout, QTextEdit, QLineEdit, QInputDialog, QScrollBar
 from PyQt5.QtGui import QColor, QIcon
 from PyQt5.QtCore import QSize
-from utils.config import Config
 
 class Info(QWidget):
 
@@ -15,7 +14,7 @@ class Info(QWidget):
 
     def initUI(self):
         self.setFixedSize(800, 500)
-        self.setWindowTitle('InfoCollector by Florian Gemperle')
+        self.setWindowTitle('InfoCollector')
         if getattr(sys, 'frozen', False):
             app_icon_path = os.path.join(os.path.abspath(os.path.dirname(sys.executable)), 'icon.png')
         else:
@@ -67,8 +66,6 @@ class Info(QWidget):
         self.output_area = QTextEdit(self)
         self.output_area.setFixedSize(750, 375)
         self.output_area.setReadOnly(True)
-        self.output_scroller = QScrollBar(self)
-        self.output_area.setVerticalScrollBar(self.output_scroller)
 
         # Status
         self.txt_total = QLabel('Total: 0', self)
@@ -178,7 +175,7 @@ class Info(QWidget):
         else:
             self.output_area.setTextColor(QColor(0, 0, 0))
         self.output_area.append(text)
-        self.output_scroller.setValue(self.output_scroller.maximum())
+        self.output_area.ensureCursorVisible()
 
 
 

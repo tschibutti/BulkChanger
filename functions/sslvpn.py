@@ -9,14 +9,14 @@ from classes.ssl_profile import SSLprofile
 def connect(ip, port, username, password):
     program = '"' + Config().sslvpn_folder + '/FortiSSLVPNclient.exe" connect -m -i -q -h ' + ip + ':' \
               + port + ' -u ' + username + ':' + password
-    subprocess.call(program, shell=True)
+    subprocess.Popen(program)
     logging.info('sslvpn: connection established')
-    time.sleep(5)
+    time.sleep(7)
 
 
 def disconnect():
     program = '"' + Config().sslvpn_folder + '/FortiSSLVPNclient.exe" disconnect'
-    subprocess.call(program, shell=True)
+    subprocess.Popen(program)
     logging.info('sslvpn: connection terminated')
     time.sleep(5)
 
