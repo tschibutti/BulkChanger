@@ -30,13 +30,13 @@ class Start(QWidget):
         self.setLayout(grid)
 
         # Buttons
-        btn_s_bulk = QPushButton('Start Bulk Changer', self)
+        btn_s_bulk = QPushButton('Start BulkChanger', self)
         btn_s_bulk.clicked.connect(self.startBulk)
         btn_s_bulk.setFixedSize(250, 60)
         btn_s_bulk.setAutoDefault(True)
         grid.addWidget(btn_s_bulk)
 
-        btn_s_info = QPushButton('Start Info Collector', self)
+        btn_s_info = QPushButton('Start InfoCollector', self)
         btn_s_info.clicked.connect(self.startInfo)
         btn_s_info.setFixedSize(250, 60)
         grid.addWidget(btn_s_info)

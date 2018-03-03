@@ -2,14 +2,15 @@ import subprocess
 import os
 import sys
 from info_collector import InfoCollector
-from PyQt5.QtWidgets import QWidget, QPushButton, QLabel, QGridLayout, QTextEdit, QLineEdit, QInputDialog, QScrollBar
+from PyQt5.QtWidgets import QWidget, QPushButton, QLabel, QGridLayout, QTextEdit, QDialog, QLineEdit, qApp
 from PyQt5.QtGui import QColor, QIcon
-from PyQt5.QtCore import QSize
+from PyQt5.QtCore import QSize, QEvent, Qt
 
 class Info(QWidget):
 
-    def __init__(self):
-        super(Info, self).__init__()
+    def __init__(self, parent=None):
+        super(Info, self).__init__(parent)
+        qApp.installEventFilter(self)
         self.initUI()
 
     def initUI(self):
@@ -39,6 +40,18 @@ class Info(QWidget):
             temp_file = open(self.config_file_path, 'w+')
             temp_file.close()
 
+        # Variables
+        self.firewall_user = ''
+        self.firewall_password = ''
+        self.sslvpn_user = ''
+        self.sslvpn_password = ''
+
+        # Dialog
+        self.start_dialog = QDialog()
+        self.start_dialog.setWindowIcon(app_icon)
+        self.start_dialog.setWindowFlags(Qt.WindowCloseButtonHint)
+        self.load_start_dialog()
+
         # Buttons
         self.btn_start = QPushButton('Start Run', self)
         self.btn_start.clicked.connect(self.start_run)
@@ -49,18 +62,22 @@ class Info(QWidget):
         btn_config.clicked.connect(self.show_config)
         btn_config.resize(btn_config.sizeHint())
 
-        btn_b_log = QPushButton('Show InfoCollector Log', self)
-        btn_b_log.clicked.connect(self.show_infolog)
-        btn_b_log.resize(btn_b_log.sizeHint())
+        btn_i_log = QPushButton('Show InfoCollector Log', self)
+        btn_i_log.clicked.connect(self.show_infolog)
+        btn_i_log.resize(btn_i_log.sizeHint())
 
-        btn_quit = QPushButton('Quit', self)
-        btn_quit.clicked.connect(self.quit_gui)
-        btn_quit.resize(btn_quit.sizeHint())
+        btn_csv = QPushButton('Open Output Folder', self)
+        btn_csv.clicked.connect(self.open_folder)
+        btn_csv.resize(btn_csv.sizeHint())
 
         self.btn_abort = QPushButton('Abort Run', self)
         self.btn_abort.clicked.connect(self.abort_run)
         self.btn_abort.resize(self.btn_abort.sizeHint())
         self.btn_abort.setEnabled(False)
+
+        btn_quit = QPushButton('Quit', self)
+        btn_quit.clicked.connect(self.quit_gui)
+        btn_quit.resize(btn_quit.sizeHint())
 
         # Text Area
         self.output_area = QTextEdit(self)
@@ -97,9 +114,10 @@ class Info(QWidget):
         grid_output.addWidget(self.output_area, 0, 0)
 
         grid_buttons.addWidget(btn_config, 3, 0)
-        grid_buttons.addWidget(btn_b_log, 3, 1)
-        grid_buttons.addWidget(self.btn_abort, 3, 2)
-        grid_buttons.addWidget(btn_quit, 3, 3)
+        grid_buttons.addWidget(btn_i_log, 3, 1)
+        grid_buttons.addWidget(btn_csv, 3, 2)
+        grid_buttons.addWidget(self.btn_abort, 3, 3)
+        grid_buttons.addWidget(btn_quit, 3, 4)
         self.setLayout(grid)
 
     def show_config(self):
@@ -110,29 +128,16 @@ class Info(QWidget):
         program = 'C:/Program Files (x86)/Notepad++/notepad++.exe'
         subprocess.Popen([program, self.info_log_path])
 
+    def open_folder(self):
+        program = 'C:/Windows/explorer.exe'
+        if getattr(sys, 'frozen', False):
+            path = os.path.abspath(os.path.dirname(sys.executable))
+        else:
+            path = os.path.join(os.path.abspath(os.path.dirname(__file__)), '..')
+        subprocess.Popen([program, path])
+
     def start_run(self):
-        text, result = QInputDialog.getText(self, 'Credentials', 'FortiGate User', QLineEdit.Normal)
-        if result:
-            self.firewall_user = str(text)
-            text, result = QInputDialog.getText(self, 'Credentials', 'FortiGate Password', QLineEdit.Password)
-            if result:
-                self.firewall_password = str(text)
-                text, result = QInputDialog.getText(self, 'Credentials', 'SSL VPN User', QLineEdit.Normal,
-                                                    self.firewall_user)
-                if result:
-                    self.sslvpn_user = str(text)
-                    text, result = QInputDialog.getText(self, 'Credentials', 'SSL VPN Password', QLineEdit.Password,
-                                                        self.firewall_password)
-                    if result:
-                        self.sslvpn_password = str(text)
-                        self.btn_start.setEnabled(False)
-                        self.btn_abort.setEnabled(True)
-                        self.output_append('black', 'START RUN')
-                        self.collector = InfoCollector(self.output_append, self.update_status, self.end_run,
-                                                       self.exception_occured, self.firewall_user,
-                                                       self.firewall_password, self.sslvpn_user,
-                                                       self.sslvpn_password)
-                        self.collector.start()
+        self.start_dialog.setVisible(True)
 
     def end_run(self):
         self.btn_start.setEnabled(True)
@@ -178,4 +183,87 @@ class Info(QWidget):
         self.output_area.ensureCursorVisible()
 
 
+    def load_start_dialog(self):
+        self.start_dialog.setFixedSize(500, 120)
+        self.start_dialog.setWindowTitle('Credentials')
 
+        # Buttons
+        btn_dialog_cancle = QPushButton('Cancle', self)
+        btn_dialog_cancle.clicked.connect(self.close_dialog)
+        btn_dialog_cancle.resize(btn_dialog_cancle.sizeHint())
+
+        self.btn_dialog_ok = QPushButton('OK', self)
+        self.btn_dialog_ok.clicked.connect(self.ok_dialog)
+        self.btn_dialog_ok.resize(self.btn_dialog_ok.sizeHint())
+
+
+        # Labels
+        txt_fgt = QLabel('FortiGate', self)
+        txt_fgt.setStyleSheet('font-size: 12px; font: bold')
+        txt_ssl = QLabel('SSL-VPN', self)
+        txt_ssl.setStyleSheet('font-size: 12px; font: bold')
+        txt_user1 = QLabel('Username:', self)
+        txt_password1 = QLabel('Password:', self)
+        txt_user2 = QLabel('Username:', self)
+        txt_password2 = QLabel('Password:', self)
+
+        # Inputs
+        self.in_fgt_user = QLineEdit()
+        self.in_fgt_user.setText(self.firewall_user)
+        self.in_fgt_pwd = QLineEdit()
+        self.in_fgt_pwd.setEchoMode(QLineEdit.Password)
+        self.in_fgt_pwd.setText(self.firewall_password)
+        self.in_ssl_user = QLineEdit()
+        self.in_ssl_user.setText(self.sslvpn_user)
+        self.in_ssl_pwd = QLineEdit()
+        self.in_ssl_pwd.setEchoMode(QLineEdit.Password)
+        self.in_ssl_pwd.setText(self.sslvpn_password)
+
+        # Layout
+        grid = QGridLayout(self)
+        grid_credentials = QGridLayout()
+        grid_buttons = QGridLayout()
+
+        grid.addLayout(grid_credentials, 0, 0)
+        grid.addLayout(grid_buttons, 2, 0)
+
+        grid_credentials.addWidget(txt_fgt, 0, 0)
+        grid_credentials.addWidget(txt_ssl, 0, 2)
+        grid_credentials.addWidget(txt_user1, 1, 0)
+        grid_credentials.addWidget(self.in_fgt_user, 1, 1)
+        grid_credentials.addWidget(txt_user2, 1, 2)
+        grid_credentials.addWidget(self.in_ssl_user, 1, 3)
+        grid_credentials.addWidget(txt_password1, 2, 0)
+        grid_credentials.addWidget(self.in_fgt_pwd, 2, 1)
+        grid_credentials.addWidget(txt_password2, 2, 2)
+        grid_credentials.addWidget(self.in_ssl_pwd, 2, 3)
+
+        grid_buttons.addWidget(self.btn_dialog_ok, 0, 0)
+        grid_buttons.addWidget(btn_dialog_cancle, 0, 1)
+
+        self.start_dialog.setLayout(grid)
+
+    def ok_dialog(self):
+        self.start_dialog.setVisible(False)
+        self.btn_start.setEnabled(False)
+        self.btn_abort.setEnabled(True)
+        self.output_append('black', 'START RUN')
+        self.collector = InfoCollector(self.output_append, self.update_status, self.end_run, self.exception_occured,
+                                       self.in_fgt_user.text(), self.in_fgt_pwd.text(), self.in_ssl_user.text(),
+                                       self.in_ssl_pwd.text())
+        self.collector.start()
+
+    def close_dialog(self):
+        self.start_dialog.close()
+
+    def update_dialog(self):
+        if self.in_ssl_user.text() == '' and self.in_fgt_user.text() != '':
+            self.in_ssl_user.setText(self.in_fgt_user.text())
+        if self.in_ssl_pwd.text() == '' and self.in_fgt_pwd.text() != '':
+            self.in_ssl_pwd.setText(self.in_fgt_pwd.text())
+
+    def eventFilter(self, obj, event):
+        if event.type() == QEvent.KeyPress:
+            if event.key() == Qt.Key_Tab:
+                self.update_dialog()
+        return super(Info, self).eventFilter(obj, event)

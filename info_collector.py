@@ -118,12 +118,12 @@ class InfoCollector(QThread):
                 executor.perform_backup(device)
             executor.collect_info(device)
             device.logout()
-            device.ping()
-            if device.online == 1:
-                logging.warning('ping: no response after command execution')
-                failed_devices.append(device)
-                self.append_callback('red', device.customer)
-                continue
+            # device.ping()
+            # if device.online == 1:
+            #     logging.warning('ping: no response after command execution')
+            #     failed_devices.append(device)
+            #     self.append_callback('red', device.customer)
+            #     continue
             logging.debug('ping: device is still online')
             success_devices.append(device)
             if sslconnected:

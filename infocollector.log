@@ -1,45 +1,15 @@
-2018-02-28 22:19:06 INFO devices: using folder as source
-2018-02-28 22:19:06 INFO devices: collected all firewalls from folder -> found 8 firewalls
-2018-02-28 22:19:06 INFO sslvpn: collected all profiles -> found 2 profiles
-2018-02-28 22:19:06 INFO ******************************************************************
-2018-02-28 22:19:06 INFO IP: 172.20.0.20	 Port:8443	 Customer: Bertschi AG
-2018-02-28 22:19:10 INFO sslvpn: found matching ssl profile at #0
-2018-02-28 22:19:10 INFO sslvpn: connection established
-2018-02-28 22:19:19 WARNING login: timed out, skip device
-2018-02-28 22:19:19 INFO ******************************************************************
-2018-02-28 22:19:19 INFO IP: 172.20.0.20	 Port:8443	 Customer: Bertschi AG
-2018-02-28 22:19:20 INFO executor: device is managed by fortimanager
-2018-02-28 22:19:20 WARNING executor: collect ap firmware failed
-2018-02-28 22:19:20 WARNING executor: collect ap firmware failed
-2018-02-28 22:19:20 WARNING executor: collect ap firmware failed
-2018-02-28 22:19:20 WARNING executor: collect ap firmware failed
-2018-02-28 22:19:20 INFO sslvpn: connection terminated
-2018-02-28 22:19:25 INFO ******************************************************************
-2018-02-28 22:19:25 INFO IP: 172.20.0.20	 Port:8443	 Customer: Bertschi AG
-2018-02-28 22:19:30 INFO sslvpn: found matching ssl profile at #0
-2018-02-28 22:19:30 INFO sslvpn: connection established
-2018-02-28 22:19:37 WARNING devices: found duplicate, remove from list
-2018-02-28 22:19:37 INFO ******************************************************************
-2018-02-28 22:19:37 INFO IP: 172.20.0.20	 Port:8443	 Customer: Bertschi AG
-2018-02-28 22:19:38 WARNING devices: found duplicate, remove from list
-2018-02-28 22:19:38 INFO ******************************************************************
-2018-02-28 22:19:38 INFO IP: 172.20.0.20	 Port:8443	 Customer: Bertschi AG
-2018-02-28 22:19:38 WARNING devices: found duplicate, remove from list
-2018-02-28 22:19:38 INFO ******************************************************************
-2018-02-28 22:19:38 INFO IP: 172.20.0.20	 Port:8443	 Customer: Bertschi AG
-2018-02-28 22:19:39 WARNING devices: found duplicate, remove from list
-2018-02-28 22:19:39 INFO ******************************************************************
-2018-02-28 22:19:39 INFO IP: 172.20.0.20	 Port:8443	 Customer: Bertschi AG
-2018-02-28 22:19:39 WARNING devices: found duplicate, remove from list
-2018-02-28 22:19:39 INFO ******************************************************************
-2018-02-28 22:19:39 INFO IP: 172.20.0.20	 Port:8443	 Customer: Bertschi AG
-2018-02-28 22:19:40 WARNING devices: found duplicate, remove from list
-2018-02-28 22:19:40 INFO sslvpn: connection terminated
+2018-03-03 21:11:24 INFO config: load config from file
+2018-03-03 21:11:24 INFO devices: using config file as source
+2018-03-03 21:11:24 INFO devices: found 1 firewalls
+2018-03-03 21:11:24 INFO sslvpn: collected all profiles -> found 3 profiles
+2018-03-03 21:11:24 INFO ******************************************************************
+2018-03-03 21:11:24 INFO IP: 46.14.239.13	 Port:8443	 Customer: Config File
+2018-03-03 21:11:35 WARNING ping: no response after command execution
 
 *********************************************
 *	Total	Success		Failed	Duplicates	*
-*	8		1			1		6			*
+*	1		0			1		0			*
 *********************************************
 
 Please check the following devices manually:
-Bertschi AG,172.20.0.20,8443	Because: wrong username or password
+Config File,46.14.239.13,8443	Because: None

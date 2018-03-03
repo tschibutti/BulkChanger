@@ -3,7 +3,8 @@ import os
 import sys
 from bulk_changer import BulkChanger
 from bulk_verify import BulkVerify
-from PyQt5.QtWidgets import QWidget, QPushButton, QLabel, QGridLayout, QTextEdit, QDialog, QLineEdit, QInputDialog, QCheckBox, QMessageBox, qApp
+from PyQt5.QtWidgets import QWidget, QPushButton, QLabel, QGridLayout, QTextEdit, QDialog, QLineEdit, QCheckBox, \
+    QMessageBox, qApp
 from PyQt5.QtGui import QColor, QIcon
 from PyQt5.QtCore import QSize, QEvent, Qt
 
@@ -54,12 +55,13 @@ class Bulk(QWidget):
         self.firewall_password = ''
         self.sslvpn_user = ''
         self.sslvpn_password = ''
-        self.ipaddress = '192.168.8.2'
+        self.ipaddress = '217.194.56.113'
         self.port = '8443'
 
         # Dialog
         self.start_dialog = QDialog()
         self.start_dialog.setWindowIcon(app_icon)
+        self.start_dialog.setWindowFlags(Qt.WindowCloseButtonHint)
         self.load_start_dialog()
 
         # Buttons
@@ -148,28 +150,6 @@ class Bulk(QWidget):
 
     def start_run(self):
         self.start_dialog.setVisible(True)
-        # text, result = QInputDialog.getText(self, 'Credentials', 'FortiGate User', QLineEdit.Normal)
-        # if result:
-        #     self.firewall_user = str(text)
-        #     text, result = QInputDialog.getText(self, 'Credentials', 'FortiGate Password', QLineEdit.Password)
-        #     if result:
-        #         self.firewall_password = str(text)
-        #         text, result = QInputDialog.getText(self, 'Credentials', 'SSL VPN User', QLineEdit.Normal,
-        #                                             self.firewall_user)
-        #         if result:
-        #             self.sslvpn_user = str(text)
-        #             text, result = QInputDialog.getText(self, 'Credentials', 'SSL VPN Password', QLineEdit.Password,
-        #                                                 self.firewall_password)
-        #             if result:
-        #                 self.sslvpn_password = str(text)
-        #                 self.btn_start.setEnabled(False)
-        #                 self.btn_abort.setEnabled(True)
-        #                 self.output_append('black', 'START RUN')
-        #                 self.changer = BulkChanger(self.output_append, self.update_status, self.end_run,
-        #                                            self.exception_occured, self.firewall_user,
-        #                                            self.firewall_password, self.sslvpn_user,
-        #                                            self.sslvpn_password)
-        #                 self.changer.start()
 
     def end_run(self):
         self.btn_start.setEnabled(True)
@@ -213,9 +193,10 @@ class Bulk(QWidget):
         else:
             self.output_area.setTextColor(QColor(0, 0, 0))
         self.output_area.append(text)
+        self.output_area.ensureCursorVisible()
 
     def load_start_dialog(self):
-        self.start_dialog.setFixedSize(700, 250)
+        self.start_dialog.setFixedSize(700, 200)
         self.start_dialog.setWindowTitle('Credentials')
 
         # Buttons
@@ -238,7 +219,7 @@ class Bulk(QWidget):
         txt_user2 = QLabel('Username:', self)
         txt_password2 = QLabel('Password:', self)
         txt_question = QLabel('Do you want to do a test run?', self)
-        txt_question.setStyleSheet('font: bold; margin-bottom: 20px; margin-top: 20px')
+        txt_question.setStyleSheet('font-size: 12px; font: bold; margin-bottom: 20px; margin-top: 20px')
         txt_ip = QLabel('IP-Address:', self)
         txt_port = QLabel('Port:', self)
 
@@ -266,14 +247,10 @@ class Bulk(QWidget):
         # Layout
         grid = QGridLayout(self)
         grid_credentials = QGridLayout()
-        grid_question = QGridLayout()
-        grid_firewall = QGridLayout()
         grid_buttons = QGridLayout()
 
         grid.addLayout(grid_credentials, 0, 0)
-        grid.addLayout(grid_question, 1, 0)
-        grid.addLayout(grid_firewall, 2, 0)
-        grid.addLayout(grid_buttons, 3, 0)
+        grid.addLayout(grid_buttons, 1, 0)
 
         grid_credentials.addWidget(txt_fgt, 0, 0)
         grid_credentials.addWidget(txt_ssl, 0, 2)

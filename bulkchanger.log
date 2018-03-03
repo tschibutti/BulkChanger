@@ -1,16 +1,3 @@
-2018-02-28 22:25:59 INFO devices: using config file as source
-2018-02-28 22:25:59 INFO devices: found 1 firewalls
-2018-02-28 22:25:59 INFO sslvpn: collected all profiles -> found 2 profiles
-2018-02-28 22:25:59 INFO command: converted cli command to rest api command
-2018-02-28 22:25:59 INFO command: parsed 1 commands
-2018-02-28 22:25:59 INFO ******************************************************************
-2018-02-28 22:25:59 INFO IP: 192.168.8.2	 Port:8443	 Customer: Config File
-2018-02-28 22:25:59 WARNING executor: object not exist, nothing to delete
-
-
-*********************************************************
-*	Total	Success		Failed	Skipped		Duplicates	*
-*	1		1			0		0			0			*
-*********************************************************
-
-Please check the following devices manually:
+2018-03-03 17:47:59 INFO config: load config from file
+2018-03-03 17:47:59 INFO command: converted cli command to rest api command
+2018-03-03 17:47:59 INFO command: parsed 1 commands
