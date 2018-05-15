@@ -3,7 +3,7 @@ from unittest import TestCase
 from functions import cli_converter
 
 
-class TestConvert_command(TestCase):
+class test_convert_command(TestCase):
     def test_delete_command(self):
         cmd = cli_converter.convert_command('delete.txt',
                                             'C:/BulkChanger/input')

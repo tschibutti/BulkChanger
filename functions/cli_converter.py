@@ -20,6 +20,7 @@ def convert_command(input_file, input_folder) -> []:
     outer_edit = False
     rename_flag = False
     clone_flag = False
+    append_flag = False
 
     source = input_folder + '/' + input_file
 
@@ -123,6 +124,22 @@ def convert_command(input_file, input_folder) -> []:
                 cname = line.split()[1]
                 caction = 'edit'
                 outer_edit = True
+        if 'append' in line:
+            if not append_flag:
+                cpath = cpath + '/' + cname
+                cbody = ''
+                append_flag = True
+            caction = 'append'
+            first = line.split()[1]
+            second = line.split(first)[1]
+            second = second[1:]
+            cname = first
+            cbody = cbody + '{"name":"' + str(second) + '"}'
+            cbody = re.sub(r'\n+', '', cbody)
+            cmd.append(Command(cpath, cbody, capi, caction, cname))
+            caction = ''
+            cname = ''
+            cbody = ''
         if ('set' in line) and not ('unset' in line):
             if cbody == '':
                 cbody = '{'
@@ -184,6 +201,8 @@ def convert_command(input_file, input_folder) -> []:
             first = line.split()[1]
             cbody = cbody + ',"' + str(first) + '":null'
         if 'next' in line:
+            if cbody == '':
+                break
             cbody = cbody + '}'
             cbody = re.sub(r'\n+', '', cbody)
             cbody = re.sub(r',]', ']', cbody)
@@ -201,7 +220,7 @@ def convert_command(input_file, input_folder) -> []:
                 cname = ''
                 caction = ''
                 outer_edit = False
-        if 'end' in line:
+        if ('end') in line and not ('append' in line):
             if inner_inner_config:
                 inner_inner_config = False
                 if 'webfilter/profile' in cpath and 'filters' in cbody:
