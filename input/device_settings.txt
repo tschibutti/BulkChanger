@@ -1,6 +1,0 @@
-# global settings (start)
-config system global
-    set admin-sport 8443
-	set admintimeout 240
-end
-# global settings (end)

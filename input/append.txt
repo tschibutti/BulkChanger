@@ -1,6 +1,0 @@
-config firewall addrgrp
-    edit grp_ffn-support
-        append member ffn-support-i4-baar
-        append member ffn-support-i4-dc
-    next
-end
