@@ -233,3 +233,14 @@ class test_convert_command(TestCase):
         self.assertEqual(cmd[2].action, 'edit')
         self.assertEqual(cmd[2].name, 'grp_ffn-support')
         self.assertEqual(cmd[2].path, 'firewall/addrgrp')
+
+    # def test_append(self):
+    #     cmd = cli_converter.convert_command('append.txt', 'C:/BulkChanger/input')
+    #     self.assertEqual(cmd[0].body, '{"name":"ffn-support-i4-baar"}')
+    #     self.assertEqual(cmd[0].action, 'append')
+    #     self.assertEqual(cmd[0].name, 'member')
+    #     self.assertEqual(cmd[0].path, 'firewall/addrgrp/grp_ffn-support')
+    #     self.assertEqual(cmd[1].body, '{"name":"ffn-support-i4-dc"}')
+    #     self.assertEqual(cmd[1].action, 'append')
+    #     self.assertEqual(cmd[1].name, 'member')
+    #     self.assertEqual(cmd[1].path, 'firewall/addrgrp/grp_ffn-support')

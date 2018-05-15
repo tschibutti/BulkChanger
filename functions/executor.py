@@ -29,6 +29,8 @@ def run_command(device, cmd):
             run_execute(device, cmd[i])
         elif 'append' in cmd[i].action:
             run_append(device, cmd[i])
+        elif 'unselect' in cmd[i].action:
+            run_delete(device, cmd[i])
         else:
             logging.error('executor: error with the command')
         i += 1
@@ -46,7 +48,7 @@ def run_delete(device, cmd):
 def run_append(device, cmd):
     req = device.session.post('https://' + device.ip + ':' + device.port + '/api/v2/' +
                               cmd.api + '/' + cmd.path + '/' + cmd.name + '?vdom=root', data=cmd.body)
-    check_existence(req)
+    check_req(req)
 
 def run_rename(device, cmd):
     req = device.session.put('https://' + device.ip + ':' + device.port + '/api/v2/' +

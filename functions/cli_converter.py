@@ -140,6 +140,20 @@ def convert_command(input_file, input_folder) -> []:
             caction = ''
             cname = ''
             cbody = ''
+        if 'unselect' in line:
+            if not append_flag:
+                cpath = cpath + '/' + cname
+                cbody = ''
+                append_flag = True
+            caction = 'unselect'
+            first = line.split()[1]
+            second = line.split(first)[1]
+            second = second[1:]
+            cname = first + '/' + second
+            cname = re.sub(r'\n+', '', cname)
+            cmd.append(Command(cpath, cbody, capi, caction, cname))
+            caction = ''
+            cname = ''
         if ('set' in line) and not ('unset' in line):
             if cbody == '':
                 cbody = '{'
