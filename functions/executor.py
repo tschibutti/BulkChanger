@@ -21,16 +21,16 @@ def run_command(device, cmd):
             run_clone(device, cmd[i])
         elif 'rename' in cmd[i].action:
             run_rename(device, cmd[i])
+        elif 'append' in cmd[i].action:
+            run_append(device, cmd[i])
+        elif 'unselect' in cmd[i].action:
+            run_delete(device, cmd[i])
         elif 'cmdb' in cmd[i].api:
             run_config(device, cmd[i])
         elif 'upload' in cmd[i].action:
             run_upload(device, cmd[i])
         elif 'execute' in cmd[i].action:
             run_execute(device, cmd[i])
-        elif 'append' in cmd[i].action:
-            run_append(device, cmd[i])
-        elif 'unselect' in cmd[i].action:
-            run_delete(device, cmd[i])
         else:
             logging.error('executor: error with the command')
         i += 1

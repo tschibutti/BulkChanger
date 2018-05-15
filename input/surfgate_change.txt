@@ -6,21 +6,21 @@ config firewall addrgrp
         unselect member ffn-support-i4
     next
 end
-# config firewall address
-#     delete fqdn_surfgate.firstframe.net
-#     delete ffn-support-i2
-#     delete ffn-support-i3
-#     delete ffn-support-i4
-#     edit "ffn-support-i4-baar"
-#         set subnet 185.75.154.2 255.255.255.255
-#     next
-#     edit "ffn-support-i4-dc"
-#         set subnet 185.75.154.6 255.255.255.255
-#     next
-# end
-# config firewall addrgrp
-#     edit grp_ffn-support
-#         append member ffn-support-i4-baar
-#         append member ffn-support-i4-dc
-#     next
-# end
+config firewall address
+    delete fqdn_surfgate.firstframe.net
+    delete ffn-support-i2
+    delete ffn-support-i3
+    delete ffn-support-i4
+    edit "ffn-support-i4-baar"
+        set subnet 185.75.154.2 255.255.255.255
+    next
+    edit "ffn-support-i4-dc"
+        set subnet 185.75.154.6 255.255.255.255
+    next
+end
+config firewall addrgrp
+    edit grp_ffn-support
+        append member ffn-support-i4-baar
+        append member ffn-support-i4-dc
+    next
+end

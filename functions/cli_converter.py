@@ -21,6 +21,7 @@ def convert_command(input_file, input_folder) -> []:
     rename_flag = False
     clone_flag = False
     append_flag = False
+    unselect_flag = False
 
     source = input_folder + '/' + input_file
 
@@ -141,10 +142,10 @@ def convert_command(input_file, input_folder) -> []:
             cname = ''
             cbody = ''
         if 'unselect' in line:
-            if not append_flag:
+            if not unselect_flag:
                 cpath = cpath + '/' + cname
                 cbody = ''
-                append_flag = True
+                unselect_flag = True
             caction = 'unselect'
             first = line.split()[1]
             second = line.split(first)[1]
@@ -215,25 +216,24 @@ def convert_command(input_file, input_folder) -> []:
             first = line.split()[1]
             cbody = cbody + ',"' + str(first) + '":null'
         if 'next' in line:
-            if cbody == '':
-                break
-            cbody = cbody + '}'
-            cbody = re.sub(r'\n+', '', cbody)
-            cbody = re.sub(r',]', ']', cbody)
-            cbody = re.sub(r'{,', '{', cbody)
-            cbody = re.sub(r',{}', '', cbody)
-            if inner_edit:
-                cbody = cbody + ',{'
-                inner_edit = False
-            else:
-                cmd.append(Command(cpath, cbody, capi, caction, cname))
-                if 'null' in cbody:
-                    # "unset" command needs to be executed twice
+            if cbody != '':
+                cbody = cbody + '}'
+                cbody = re.sub(r'\n+', '', cbody)
+                cbody = re.sub(r',]', ']', cbody)
+                cbody = re.sub(r'{,', '{', cbody)
+                cbody = re.sub(r',{}', '', cbody)
+                if inner_edit:
+                    cbody = cbody + ',{'
+                    inner_edit = False
+                else:
                     cmd.append(Command(cpath, cbody, capi, caction, cname))
-                cbody = ''
-                cname = ''
-                caction = ''
-                outer_edit = False
+                    if 'null' in cbody:
+                        # "unset" command needs to be executed twice
+                        cmd.append(Command(cpath, cbody, capi, caction, cname))
+            cbody = ''
+            cname = ''
+            caction = ''
+            outer_edit = False
         if ('end') in line and not ('append' in line):
             if inner_inner_config:
                 inner_inner_config = False
@@ -248,6 +248,10 @@ def convert_command(input_file, input_folder) -> []:
                 if 'null' in cbody:
                     # "unset" command need to be executed twice
                     cmd.append(Command(cpath, cbody, capi, caction, cname))
+                elif unselect_flag:
+                    unselect_flag = False
+                elif append_flag:
+                    append_flag = False
                 elif rename_flag:
                     rename_flag = False
                 elif clone_flag:
