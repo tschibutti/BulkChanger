@@ -66,22 +66,15 @@ def collect_firewalls() -> []:
                 else:
                     fgt_port = "80"
             devices.append(Device(customer, fgt_ip, fgt_port))
-    if not devices:
-        logging.error('devices: no firewalls found, abort execution')
-        return devices
-
     logging.info('devices: collected all firewalls from folder -> found ' + str(len(devices)) + ' firewalls')
-    remove_umlaut(devices)
-    return devices
+    return remove_umlaut(devices)
 
 
 def remove_umlaut(devices):
-    i = 0
-    while i < len(devices):
-        devices[i].customer = re.sub(r'ä', 'ae', devices[i].customer)
-        devices[i].customer = re.sub(r'ö', 'oe', devices[i].customer)
-        devices[i].customer = re.sub(r'ü', 'ue', devices[i].customer)
-        devices[i].customer = re.sub(r'Ä', 'AE', devices[i].customer)
-        devices[i].customer = re.sub(r'Ö', 'OE', devices[i].customer)
-        devices[i].customer = re.sub(r'Ü', 'UE', devices[i].customer)
-        i += 1
+    for dev in devices:
+        dev.customer = re.sub(r'ä', 'ae', dev.customer)
+        dev.customer = re.sub(r'ö', 'oe', dev.customer)
+        dev.customer = re.sub(r'ü', 'ue', dev.customer)
+        dev.customer = re.sub(r'Ä', 'AE', dev.customer)
+        dev.customer = re.sub(r'Ö', 'OE', dev.customer)
+        dev.customer = re.sub(r'Ü', 'UE', dev.customer)

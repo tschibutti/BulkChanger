@@ -17,7 +17,6 @@ class Device:
         self.timeout = 5
         self.connected = False
         self.customer = customer
-        self.online = 0
         self.firmware = None
         self.serial = None
         self.reason = None
@@ -78,9 +77,10 @@ class Device:
             logging.debug('device: firmware condition meet')
 
     def ping(self):
-        self.online = os.system('ping -n 1 -w 1500 ' + self.ip + ' > nul')
-        self.online = os.system('ping -n 1 -w 1500 ' + self.ip + ' > nul')
-        self.online = os.system('ping -n 1 -w 1500 ' + self.ip + ' > nul')
+        for i in range(0, 3):
+            count = os.system('ping -n 1 -w 1000 ' + self.ip + ' > nul')
+        return True if count > 0 else False
+
 
     def check_ip(self) -> bool:
         # Check for DNS Names

@@ -5,8 +5,7 @@ from functions import cli_converter
 
 class test_convert_command(TestCase):
     def test_delete_command(self):
-        cmd = cli_converter.convert_command('delete.txt',
-                                            'C:/BulkChanger/input')
+        cmd = cli_converter.convert_command('delete.txt', 'C:/BulkChanger/input')
         self.assertEqual(cmd[0].body, '')
         self.assertEqual(cmd[0].action, 'delete')
         self.assertEqual(cmd[0].name, '1')

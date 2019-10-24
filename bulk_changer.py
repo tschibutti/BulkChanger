@@ -79,12 +79,14 @@ class BulkChanger(QThread):
         # GET FIREWALL LIST
         devices = customers.collect_firewalls()
         if not devices:
+            logging.error('devices: no firewalls found, abort execution')
             self.exception_callback('devices')
             self.stop()
 
         # COLLECT SSL VPN PROFILES:
         sslprofile = sslvpn.collect()
-        if sslprofile == None:
+        if not sslprofile:
+            logging.error('sslvpn: no profiles found, abort execution')
             self.exception_callback('ssl vpn profile')
             self.stop()
 
@@ -111,8 +113,7 @@ class BulkChanger(QThread):
             logging.info('IP: ' + device.ip + '\t Port:' + device.port + '\t Customer: ' + device.customer)
             if device.check_ip():
                 # check if local device
-                device.ping()
-                if device.online == 1:
+                if device.ping():
                     index = sslvpn.match(device.customer, sslprofile)
                     if index == -1:
                         logging.warning('sslvpn: found no matching ssl profile')
@@ -120,10 +121,10 @@ class BulkChanger(QThread):
                         device.reason = 'private ip and no sslvpn profile'
                         self.append_callback('red', device.customer)
                         continue
-                    sslvpn.connect(sslprofile[index].ip, sslprofile[index].port, self.sslvpn_user, self.sslvpn_password)
-                    sslconnected = True
-            device.ping()
-            if device.online == 1:
+                    if not sslvpn.connect(sslprofile[index].ip, sslprofile[index].port, self.sslvpn_user, self.sslvpn_password):
+                        self.exception_callback('sslvpn connect')
+                        self.stop()
+            if device.ping():
                 # try to login anyway
                 device.login(self.firewall_user, self.firewall_password)
                 if not device.connected:
@@ -160,12 +161,6 @@ class BulkChanger(QThread):
                 executor.perform_backup(device)
             executor.run_command(device, cmd)
             device.logout()
-            # device.ping()
-            # if device.online == 1:
-            #     logging.warning('ping: no response after command execution')
-            #     failed_devices.append(device)
-            #     self.append_callback('red', device.customer)
-            #     continue
             logging.debug('ping: device is still online')
             success_devices.append(device)
             self.append_callback('green', device.customer)
